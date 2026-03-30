@@ -7,6 +7,8 @@
   overflow: hidden;
   display: grid;
   place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
   min-height: 24rem;
   aspect-ratio: 1;
   border-radius: 50%;

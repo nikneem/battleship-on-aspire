@@ -2,26 +2,87 @@
   display: block;
 }
 
-.page-radar-layer {
-  position: fixed;
-  top: 50%;
-  right: clamp(-6rem, -2vw, -1rem);
-  transform: translateY(-50%);
-  inline-size: min(42rem, 46vw);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.48;
-  filter: saturate(1.15);
+.hero-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  min-height: calc(100dvh - (var(--battle-ops-shell-padding) * 2));
+  padding-block: clamp(1.5rem, 4vh, 3rem);
+  overflow: hidden;
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 18% 22%, rgb(0 229 255 / 0.1), transparent 24%),
+    radial-gradient(circle at 82% 52%, rgb(0 229 255 / 0.08), transparent 30%),
+    linear-gradient(180deg, rgb(8 17 28 / 0.96), rgb(5 11 19 / 0.98));
 }
 
-.page-radar-layer bat-landing-radar {
+.hero-stage::before,
+.hero-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-stage::before {
+  background-image:
+    linear-gradient(rgb(102 242 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(102 242 255 / 0.035) 1px, transparent 1px);
+  background-size: 2.8rem 2.8rem;
+  mask-image: radial-gradient(circle at center, black 58%, transparent 94%);
+}
+
+.hero-stage::after {
+  inset: 1.25rem;
+  border: 1px solid rgb(102 242 255 / 0.08);
+  border-radius: 1.4rem;
+}
+
+.hero-stage__radar {
+  position: absolute;
+  top: 50%;
+  right: clamp(-8rem, -4vw, -1rem);
+  transform: translateY(-50%);
+  inline-size: min(48rem, 52vw);
+  block-size: min(96dvh, 58rem);
+  opacity: 0.42;
+  pointer-events: none;
+  filter: saturate(1.08);
+}
+
+.hero-stage__radar bat-landing-radar,
+.hero-stage__jumbo {
   display: block;
 }
 
+.hero-stage__jumbo {
+  position: relative;
+  z-index: 1;
+  inline-size: min(100%, 72rem);
+  margin-inline-start: clamp(0rem, 6vw, 4.5rem);
+}
+
 @media (max-width: 1100px) {
-  .page-radar-layer {
-    right: -8rem;
-    inline-size: min(28rem, 78vw);
-    opacity: 0.26;
+  .hero-stage {
+    min-height: auto;
+    padding-block: 1.25rem;
+    border-radius: 1.15rem;
+  }
+
+  .hero-stage::after {
+    inset: 0.85rem;
+    border-radius: 1rem;
+  }
+
+  .hero-stage__radar {
+    right: -5rem;
+    inline-size: min(30rem, 82vw);
+    block-size: min(30rem, 82vw);
+    opacity: 0.24;
+  }
+
+  .hero-stage__jumbo {
+    margin-inline-start: 0;
   }
 }

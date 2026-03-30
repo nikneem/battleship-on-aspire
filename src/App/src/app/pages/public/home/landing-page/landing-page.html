@@ -1,14 +1,18 @@
-<div class="page-radar-layer" aria-hidden="true">
-  <bat-landing-radar [contacts]="radarContacts()" />
-</div>
-
 <main class="shell">
-  <bat-landing-hero
-    [telemetry]="telemetry()"
-    [audioInstruction]="audioInstruction()"
-    [gaugeReadouts]="gaugeReadouts()"
-    [terminalFeed]="terminalFeed()"
-  />
+  <section class="hero-stage" aria-label="Battle Ops hero stage">
+    <div class="hero-stage__radar" aria-hidden="true">
+      <bat-landing-radar [contacts]="radarContacts()" />
+    </div>
+
+    <div class="hero-stage__jumbo">
+      <bat-landing-hero
+        [telemetry]="telemetry()"
+        [audioInstruction]="audioInstruction()"
+        [gaugeReadouts]="gaugeReadouts()"
+        [terminalFeed]="terminalFeed()"
+      />
+    </div>
+  </section>
 
   <section class="content-stack" aria-label="Landing page tactical panels">
     <div class="content-row">
