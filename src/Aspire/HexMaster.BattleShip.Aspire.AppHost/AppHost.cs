@@ -5,10 +5,11 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var anonymousPlayerStateStore = builder.AddDaprStateStore("statestore");
 
-builder.AddProject<Projects.HexMaster_BattleShip_Api>("hexmaster-battleship-api")
+var api = builder.AddProject<Projects.HexMaster_BattleShip_Api>("hexmaster-battleship-api")
     .WithDaprSidecar(sidecar => sidecar.WithReference(anonymousPlayerStateStore));
 
 var battleship = builder.AddJavaScriptApp("battleship", @"..\..\App", "start")
+    .WithEnvironment("BATTLESHIP_API_URL", api.GetEndpoint("https"))
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
 
