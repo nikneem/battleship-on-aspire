@@ -1,16 +1,18 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { BattleOpsSoundSettingsService } from '../../../../battle-ops-sound-settings.service';
 import { BattleOpsStyleSettingsService, type AccentIntensity, type DensityMode } from '../../../../battle-ops-style-settings.service';
 import { LandingDoctrine } from './components/landing-doctrine/landing-doctrine';
 import { LandingHero } from './components/landing-hero/landing-hero';
 import { LandingMission } from './components/landing-mission/landing-mission';
 import { LandingSettings } from './components/landing-settings/landing-settings';
+import { LandingSoundSettings } from './components/landing-sound-settings/landing-sound-settings';
 import { type GaugeReadout, type RadarContact } from './landing-page.models';
 import { terminalMessages } from './terminal-messages';
 
 @Component({
   selector: 'bat-landing-page',
-  imports: [LandingHero, LandingSettings, LandingDoctrine, LandingMission],
+  imports: [LandingHero, LandingSettings, LandingDoctrine, LandingMission, LandingSoundSettings],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +22,7 @@ import { terminalMessages } from './terminal-messages';
 })
 export class LandingPage {
   private readonly styleSettingsService = inject(BattleOpsStyleSettingsService);
+  private readonly soundSettingsService = inject(BattleOpsSoundSettingsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly document = inject(DOCUMENT);
   private readonly audio =
@@ -31,6 +34,7 @@ export class LandingPage {
   private messageCursor = 0;
 
   protected readonly settings = this.styleSettingsService.settings.asReadonly();
+  protected readonly soundSettings = this.soundSettingsService.settings.asReadonly();
   protected readonly densityOptions = [
     { label: 'COMPACT', value: 'compact', hint: 'tight tactical spacing' },
     { label: 'STANDARD', value: 'standard', hint: 'balanced command spacing' },
@@ -79,9 +83,14 @@ export class LandingPage {
 
     if (this.audio !== null) {
       this.audio.preload = 'auto';
-      this.audio.volume = 0.2;
       this.audio.addEventListener('ended', this.handleSonarEnd);
     }
+
+    effect(() => {
+      if (this.audio !== null) {
+        this.audio.volume = this.soundSettings().effectsVolume / 100;
+      }
+    });
 
     if (this.document.defaultView !== null) {
       this.scheduleTerminalUpdate();
@@ -132,6 +141,14 @@ export class LandingPage {
 
   protected setAccentIntensity(value: AccentIntensity): void {
     this.styleSettingsService.setAccentIntensity(value);
+  }
+
+  protected setEffectsVolume(value: number): void {
+    this.soundSettingsService.setEffectsVolume(value);
+  }
+
+  protected setMusicVolume(value: number): void {
+    this.soundSettingsService.setMusicVolume(value);
   }
 
   private seedTerminalFeed(): void {

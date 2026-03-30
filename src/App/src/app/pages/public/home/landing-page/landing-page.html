@@ -20,3 +20,9 @@
     <bat-landing-mission [missionHighlights]="missionHighlights" />
   </section>
 </main>
+
+<bat-landing-sound-settings
+  [settings]="soundSettings()"
+  (effectsVolumeChange)="setEffectsVolume($event)"
+  (musicVolumeChange)="setMusicVolume($event)"
+/>

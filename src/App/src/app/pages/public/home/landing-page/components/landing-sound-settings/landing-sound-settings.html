@@ -1,0 +1,65 @@
+<div class="sound-settings-launcher">
+  @if (overlayOpen()) {
+    <button
+      type="button"
+      class="sound-settings-backdrop"
+      aria-label="Close sound settings"
+      (click)="closeOverlay()"
+    ></button>
+  }
+
+  <div class="sound-settings-shell">
+    @if (overlayOpen()) {
+      <aside class="sound-settings-panel tactical-panel" aria-labelledby="sound-settings-title">
+        <div class="panel-heading">
+          <p class="panel-kicker">AUDIO CONTROL</p>
+          <h2 id="sound-settings-title">SOUND SETTINGS</h2>
+        </div>
+
+        <div class="sound-slider-group">
+          <label class="sound-slider" for="effects-volume">
+            <span>SOUND EFFECTS</span>
+            <strong>{{ settings().effectsVolume }}%</strong>
+          </label>
+          <input
+            id="effects-volume"
+            type="range"
+            min="0"
+            max="100"
+            [value]="settings().effectsVolume"
+            (input)="updateEffectsVolume($event)"
+            aria-label="Sound effects volume"
+          />
+          <p>Controls sonar pulse playback volume.</p>
+        </div>
+
+        <div class="sound-slider-group">
+          <label class="sound-slider" for="music-volume">
+            <span>BACKGROUND MUSIC</span>
+            <strong>{{ settings().musicVolume }}%</strong>
+          </label>
+          <input
+            id="music-volume"
+            type="range"
+            min="0"
+            max="100"
+            [value]="settings().musicVolume"
+            (input)="updateMusicVolume($event)"
+            aria-label="Music volume"
+          />
+          <p>Stored for future soundtrack support. No music is playing yet.</p>
+        </div>
+      </aside>
+    }
+
+    <button
+      type="button"
+      class="sound-settings-toggle"
+      aria-label="Open sound settings"
+      [attr.aria-expanded]="overlayOpen()"
+      (click)="toggleOverlay()"
+    >
+      <i class="pi pi-cog" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
