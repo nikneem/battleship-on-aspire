@@ -16,4 +16,4 @@
 ## 4. Verification
 
 - [x] 4.1 Validate that the application root renders the landing page instead of the starter content.
-- [ ] 4.2 Verify the animated UI, terminal updates, and sonar timing behavior work as intended without introducing build or test regressions in the Angular app.
+- [x] 4.2 Verify the animated UI, terminal updates, and sonar timing behavior work as intended without introducing build or test regressions in the Angular app.
