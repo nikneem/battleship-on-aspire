@@ -35,6 +35,17 @@ describe('App', () => {
     expect(compiled.textContent).toContain('TACTICAL TERMINAL');
   });
 
+  it('should save default sound volumes locally on first load', async () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(localStorage.getItem('battle-ops-effects-volume')).toBe('50');
+    expect(localStorage.getItem('battle-ops-music-volume')).toBe('30');
+  });
+
   it('should persist style settings locally', async () => {
     const fixture = TestBed.createComponent(App);
     const router = TestBed.inject(Router);

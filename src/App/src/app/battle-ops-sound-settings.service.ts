@@ -6,8 +6,8 @@ export interface BattleOpsSoundSettings {
   readonly musicVolume: number;
 }
 
-const defaultEffectsVolume = 20;
-const defaultMusicVolume = 35;
+const defaultEffectsVolume = 50;
+const defaultMusicVolume = 30;
 
 @Injectable({ providedIn: 'root' })
 export class BattleOpsSoundSettingsService {
@@ -46,8 +46,14 @@ export class BattleOpsSoundSettingsService {
   }
 
   private readVolume(storageKey: string, fallback: number): number {
-    const storedValue = Number(this.storage?.getItem(storageKey));
-    return Number.isFinite(storedValue) ? this.clampVolume(storedValue) : fallback;
+    const storedValue = this.storage?.getItem(storageKey);
+
+    if (storedValue === null) {
+      return fallback;
+    }
+
+    const parsedValue = Number(storedValue);
+    return Number.isFinite(parsedValue) ? this.clampVolume(parsedValue) : fallback;
   }
 
   private clampVolume(value: number): number {
