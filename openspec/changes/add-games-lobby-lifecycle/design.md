@@ -81,14 +81,14 @@ Alternative considered: adding `StartGameCommand`. That adds another command pat
 - [Secret verification drifting into endpoints] -> Keep secret verification in application handlers behind an abstraction so the aggregate remains secret-agnostic but invariants stay enforced.
 - [Profile creation and game creation becoming tightly coupled] -> Keep profile establishment in the surrounding application flow so the `Games` module depends on a player identifier, not on `Profiles` internals.
 - [State machine becoming too coarse] -> Keep subordinate readiness and board-lock state explicit on `PlayerSlot` and `Board`, with tests covering transition guards.
-- [Terminal-state semantics around abandonment] -> Define and document when abandonment results in a forfeit win versus a neutral terminated game before implementation starts.
+- [Terminal-state semantics around abandonment] -> Treat abandonment as a neutral terminal state with no winner so joined sessions end consistently without implying a forfeit rule that has not been designed.
 
 ## Migration Plan
 
 This is a greenfield capability, so no data migration is required. Implementation should land in vertical slices: abstractions and DTOs first, domain and handlers second, API endpoints third, followed by tests. If rollback is needed, the change can be removed feature-by-feature because no existing user-facing gameplay behavior depends on it yet.
 
-## Open Questions
+## Resolved Rules
 
-- Should an in-progress abandonment always award the remaining player a win by forfeit, or should the match end as abandoned with no winner?
-- Should a successful hit grant another turn, or should turns always alternate after every shot?
-- Should lobbies expire automatically after inactivity, and if so, is that part of this change or a follow-up capability?
+- Turns always alternate after every shot, even after a hit or sink, unless the shot ends the game.
+- Abandonment by either joined player ends the game as `Abandoned` with no winner recorded.
+- Lobby expiry remains out of scope for this change and can be designed as a follow-up capability.

@@ -42,6 +42,11 @@ The system MUST allow firing only during the `InProgress` phase, only from the p
 - **THEN** the system records the shot result against the opponent board
 - **AND** the system updates turn state according to the game rules
 
+#### Scenario: Turns alternate after every non-terminal shot
+- **WHEN** the current-turn player fires a valid shot that does not end the game
+- **THEN** the system assigns the next turn to the opposing player
+- **AND** the firing player does not receive an additional turn for a hit
+
 #### Scenario: Reject out-of-turn shots
 - **WHEN** a player who does not own the current turn attempts to fire a shot
 - **THEN** the system rejects the action
@@ -81,3 +86,7 @@ The system MUST allow games to reach a terminal state when one player sinks the 
 - **WHEN** a joined player abandons a game in the `LobbyFull`, `Setup`, or `InProgress` phase
 - **THEN** the system transitions the game to the `Abandoned` phase
 - **AND** no further setup or gameplay actions are accepted
+
+#### Scenario: Abandonment records no winner
+- **WHEN** a joined player abandons a game and the system transitions it to `Abandoned`
+- **THEN** the system records no winner for that game
