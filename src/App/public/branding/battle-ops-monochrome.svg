@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Battle Ops monochrome logo</title>
+  <desc id="desc">Monochrome sonar and compass brand mark.</desc>
+  <rect width="128" height="128" rx="20" fill="#05070A"/>
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#F8FCFF" stroke-opacity="0.45" stroke-width="2"/>
+  <circle cx="64" cy="64" r="30" fill="none" stroke="#F8FCFF" stroke-opacity="0.32" stroke-width="2"/>
+  <path d="M64 64L100 40" stroke="#F8FCFF" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="5" fill="#F8FCFF"/>
+  <path d="M44 68h40l-6 6H50Zm10-12h16l4 4H50Z" fill="#F8FCFF"/>
+</svg>

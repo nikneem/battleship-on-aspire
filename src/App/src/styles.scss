@@ -1,2 +1,198 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 @import "primeicons/primeicons.css";
+
+:root {
+  color-scheme: dark;
+  --battle-ops-abyss-black: #05070a;
+  --battle-ops-midnight-blue: #0a1a2a;
+  --battle-ops-electric-cyan: #00e5ff;
+  --battle-ops-soft-aqua: #66f2ff;
+  --battle-ops-steel-blue-gray: #2c3a47;
+  --battle-ops-amber: #ffb300;
+  --battle-ops-damage-red: #b33a3a;
+  --battle-ops-text-primary: #edfaff;
+  --battle-ops-text-secondary: rgb(180 219 229 / 0.82);
+  --battle-ops-panel-base: rgb(10 26 42 / 0.92);
+  --battle-ops-panel-elevated: rgb(12 28 46 / 0.94);
+  --battle-ops-border-color: rgb(102 242 255 / 0.24);
+  --battle-ops-accent-color: var(--battle-ops-electric-cyan);
+  --battle-ops-accent-glow: rgb(0 229 255 / 0.16);
+  --battle-ops-glow-color: rgb(0 229 255 / 0.35);
+  --battle-ops-transition-duration: 220ms;
+  --battle-ops-panel-padding: 1.2rem;
+  --battle-ops-shell-padding: 1.5rem;
+  --battle-ops-shell-gap: 1.5rem;
+  --battle-ops-background:
+    radial-gradient(circle at top, rgb(0 229 255 / 0.1), transparent 36%),
+    linear-gradient(180deg, #07101b 0%, #05070a 65%, #030507 100%);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+:root[data-density='compact'] {
+  --battle-ops-panel-padding: 1rem;
+  --battle-ops-shell-gap: 1rem;
+}
+
+:root[data-density='relaxed'] {
+  --battle-ops-panel-padding: 1.45rem;
+  --battle-ops-shell-gap: 1.75rem;
+}
+
+:root[data-accent='surge'] {
+  --battle-ops-accent-color: var(--battle-ops-soft-aqua);
+  --battle-ops-accent-glow: rgb(102 242 255 / 0.22);
+  --battle-ops-glow-color: rgb(102 242 255 / 0.42);
+}
+
+:root[data-motion='reduced'] {
+  --battle-ops-transition-duration: 1ms;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--battle-ops-background);
+  color: var(--battle-ops-text-primary);
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 0.5px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(102 242 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(102 242 255 / 0.035) 1px, transparent 1px);
+  background-size: 2.5rem 2.5rem;
+  mask-image: radial-gradient(circle at center, black 32%, transparent 82%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input {
+  transition:
+    color var(--battle-ops-transition-duration) ease,
+    border-color var(--battle-ops-transition-duration) ease,
+    background-color var(--battle-ops-transition-duration) ease,
+    box-shadow var(--battle-ops-transition-duration) ease,
+    transform var(--battle-ops-transition-duration) ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--battle-ops-soft-aqua);
+  outline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+bat-root {
+  display: block;
+  min-height: 100dvh;
+  padding: var(--battle-ops-shell-padding);
+}
+
+.tactical-panel {
+  border: 1px solid var(--battle-ops-border-color);
+  background:
+    linear-gradient(180deg, rgb(16 38 58 / 0.9), rgb(5 12 19 / 0.94)),
+    var(--battle-ops-panel-base);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 229 255 / 0.04),
+    0 0 28px var(--battle-ops-accent-glow);
+  padding: var(--battle-ops-panel-padding);
+}
+
+.battle-ops-button.p-button,
+.battle-ops-button .p-button {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  border: 1px solid var(--battle-ops-accent-color);
+  background: rgb(0 229 255 / 0.08);
+  color: var(--battle-ops-text-primary);
+  box-shadow: 0 0 18px rgb(0 229 255 / 0.08);
+}
+
+.battle-ops-button--secondary.p-button,
+.battle-ops-button--secondary .p-button {
+  background: transparent;
+}
+
+.battle-ops-button.p-button:hover,
+.battle-ops-button.p-button:focus-visible,
+.battle-ops-button .p-button:hover,
+.battle-ops-button .p-button:focus-visible {
+  background: rgb(0 229 255 / 0.14);
+  box-shadow: 0 0 22px rgb(0 229 255 / 0.2);
+}
+
+.p-button,
+.p-selectbutton,
+.p-dialog,
+.p-datatable,
+.p-inputtext {
+  --p-primary-color: var(--battle-ops-accent-color);
+}
+
+.p-dialog,
+.p-datatable,
+.p-inputtext {
+  border-radius: 0;
+}
+
+.p-dialog {
+  border: 1px solid var(--battle-ops-border-color);
+  box-shadow: 0 0 30px var(--battle-ops-accent-glow);
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr > td {
+  background: var(--battle-ops-panel-base);
+  color: var(--battle-ops-text-primary);
+}
+
+.p-inputtext {
+  background: rgb(5 12 19 / 0.84);
+  border-color: var(--battle-ops-border-color);
+  color: var(--battle-ops-text-primary);
+}
+
+.p-inputtext:enabled:hover,
+.p-inputtext:enabled:focus {
+  border-color: var(--battle-ops-accent-color);
+  box-shadow: 0 0 0 1px var(--battle-ops-accent-color);
+}
+
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}

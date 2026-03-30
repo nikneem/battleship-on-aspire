@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Battle Ops minimal logo</title>
+  <desc id="desc">Compass ring with sonar sweep.</desc>
+  <rect width="128" height="128" rx="20" fill="#05070A"/>
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#66F2FF" stroke-opacity="0.24" stroke-width="2"/>
+  <circle cx="64" cy="64" r="30" fill="none" stroke="#66F2FF" stroke-opacity="0.2" stroke-width="2"/>
+  <path d="M64 64L98 38A48 48 0 0 1 110 64Z" fill="#00E5FF" fill-opacity="0.18"/>
+  <path d="M64 64L100 40" stroke="#00E5FF" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="5" fill="#66F2FF"/>
+  <path d="M64 16v14M64 98v14M16 64h14M98 64h14" stroke="#2C3A47" stroke-width="3" stroke-linecap="round"/>
+</svg>

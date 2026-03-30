@@ -2,6 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
 describe('App', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.removeAttribute('data-motion');
+    document.documentElement.removeAttribute('data-density');
+    document.documentElement.removeAttribute('data-accent');
+  });
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
@@ -14,10 +21,32 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render the Battle Ops shell', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, battleship');
+    expect(compiled.querySelector('h1')?.textContent).toContain('BATTLE OPS');
+    expect(compiled.textContent).toContain('TACTICAL PROFILE');
+  });
+
+  it('should persist style settings locally', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const motionToggle = host.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+    const densityButtons = host.querySelectorAll('.option-chip');
+    const relaxedDensityButton = densityButtons.item(2) as HTMLButtonElement | null;
+
+    motionToggle?.click();
+    relaxedDensityButton?.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(localStorage.getItem('battle-ops-reduced-motion')).toBe('true');
+    expect(localStorage.getItem('battle-ops-density')).toBe('relaxed');
+    expect(document.documentElement.dataset['motion']).toBe('reduced');
+    expect(document.documentElement.dataset['density']).toBe('relaxed');
   });
 });
