@@ -33,14 +33,14 @@ export class LandingPage {
 
   protected readonly soundSettings = this.soundSettingsService.settings.asReadonly();
   protected readonly defenseStrategies = [
-    'Queue up a live Battleship board and track every hit, miss, and sunk ship from one command surface.',
-    'Use the sonar feed to stay locked on the latest moves before you commit your next shot.',
-    'Open the game, place your fleet, and start trading volleys as soon as the board is ready.'
+    'Start with a playable Battleship experience that gives visitors an immediate reason to engage with the app.',
+    'Show how AI-assisted delivery turns a themed landing page into a polished, working product in small verified steps.',
+    'Connect the frontend story back to Aspire orchestration so the system teaches modern full-stack development practices.'
   ] as const;
   protected readonly missionHighlights = [
-    'Launch a playable Battleship match directly from the Battle Ops experience.',
-    'Deploy your fleet, call shots, and watch the tactical feed react in real time.',
-    'Use the landing page as the briefing room before you enter the actual game board.'
+    'Invite visitors to play Battleship through a cinematic submarine command deck.',
+    'Teach AI-driven development through visible proposal, implementation, and verification loops.',
+    'Highlight how Aspire coordinates the supporting services behind the game experience.'
   ] as const;
   protected readonly terminalFeed = signal<string[]>([]);
   protected readonly gaugeReadouts = signal<GaugeReadout[]>([

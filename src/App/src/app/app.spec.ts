@@ -57,7 +57,8 @@ describe('App', () => {
 
     expect(host.textContent).not.toContain('TACTICAL SETTINGS');
     expect(host.textContent).toContain('PLAY BATTLESHIP');
-    expect(host.textContent).toContain('playable Battleship experience');
+    expect(host.textContent).toContain('teach AI-driven development');
+    expect(host.textContent).toContain('Aspire orchestration');
   });
 
   it('should open sound settings and persist sound volumes locally', async () => {
