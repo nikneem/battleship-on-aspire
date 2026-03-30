@@ -17,12 +17,3 @@ export interface RadarContact {
   readonly code: string;
   readonly pulseDelay: string;
 }
-
-export interface RadarContact {
-  readonly id: string;
-  readonly top: string;
-  readonly left: string;
-  readonly coordinates: string;
-  readonly code: string;
-  readonly pulseDelay: string;
-}

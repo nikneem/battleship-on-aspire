@@ -8,7 +8,7 @@
     <div class="radar-sweep-line"></div>
   </div>
 
-  @for (contact of contacts(); track contact.id) {
+  @for (contact of renderedContacts(); track contact.id) {
     <div class="radar-contact" [style.top]="contact.top" [style.left]="contact.left">
       <span class="radar-contact__dot" [style.animation-delay]="contact.pulseDelay"></span>
       <span class="radar-contact__label">{{ contact.coordinates }} // {{ contact.code }}</span>
