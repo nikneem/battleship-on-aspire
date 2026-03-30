@@ -17,7 +17,7 @@ export class LandingTerminal {
   readonly visitorInput = signal('');
   readonly visitorMessages = signal<string[]>([]);
   readonly combinedLines = computed(() => [...this.lines(), ...this.visitorMessages()]);
-  readonly historyLines = computed(() => this.combinedLines().slice(-6, -1));
+  readonly historyLines = computed(() => this.combinedLines().slice(-6, -1).reverse());
   readonly activeLine = computed(() => this.combinedLines().at(-1) ?? 'SCANNING FOR CONTACTS...');
   readonly typedLine = signal('');
 

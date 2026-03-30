@@ -5,11 +5,11 @@
   </div>
 
   <div class="terminal-feed" role="log" aria-live="polite">
+    <p class="typed-line">{{ typedLine() }}<span class="terminal-cursor" aria-hidden="true"></span></p>
+
     @for (line of historyLines(); track line) {
       <p>{{ line }}</p>
     }
-
-    <p class="typed-line">{{ typedLine() }}<span class="terminal-cursor" aria-hidden="true"></span></p>
   </div>
 
   <form class="terminal-input" (submit)="$event.preventDefault(); submitVisitorMessage()">
