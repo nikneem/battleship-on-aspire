@@ -1,8 +1,12 @@
 using Aspire.Hosting.ApplicationModel;
+using CommunityToolkit.Aspire.Hosting.Dapr;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.HexMaster_BattleShip_Api>("hexmaster-battleship-api");
+var anonymousPlayerStateStore = builder.AddDaprStateStore("statestore");
+
+builder.AddProject<Projects.HexMaster_BattleShip_Api>("hexmaster-battleship-api")
+    .WithDaprSidecar(sidecar => sidecar.WithReference(anonymousPlayerStateStore));
 
 var battleship = builder.AddJavaScriptApp("battleship", @"..\..\App", "start")
     .WithHttpEndpoint(env: "PORT")

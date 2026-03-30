@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Aspire\HexMaster.BattleShip.Aspire.ServiceDefaults\HexMaster.BattleShip.Aspire.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Profiles\HexMaster.BattleShip.Profiles\HexMaster.BattleShip.Profiles.csproj" />
+    <ProjectReference Include="..\Profiles\HexMaster.BattleShip.Profiles.Abstractions\HexMaster.BattleShip.Profiles.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

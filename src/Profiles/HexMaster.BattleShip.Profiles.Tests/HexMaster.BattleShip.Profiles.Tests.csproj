@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HexMaster.BattleShip.Profiles\HexMaster.BattleShip.Profiles.csproj" />
+    <ProjectReference Include="..\HexMaster.BattleShip.Profiles.Abstractions\HexMaster.BattleShip.Profiles.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
