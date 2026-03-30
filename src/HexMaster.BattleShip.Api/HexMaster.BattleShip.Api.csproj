@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Aspire\HexMaster.BattleShip.Aspire.ServiceDefaults\HexMaster.BattleShip.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\HexMaster.BattleShip.Core\HexMaster.BattleShip.Core.csproj" />
+    <ProjectReference Include="..\Games\HexMaster.BattleShip.Games\HexMaster.BattleShip.Games.csproj" />
     <ProjectReference Include="..\Profiles\HexMaster.BattleShip.Profiles\HexMaster.BattleShip.Profiles.csproj" />
     <ProjectReference Include="..\Profiles\HexMaster.BattleShip.Profiles.Abstractions\HexMaster.BattleShip.Profiles.Abstractions.csproj" />
   </ItemGroup>

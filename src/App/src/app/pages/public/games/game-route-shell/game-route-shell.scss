@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+.game-shell {
+  display: grid;
+  gap: 1rem;
+  max-width: 36rem;
+  margin-inline: auto;
+}

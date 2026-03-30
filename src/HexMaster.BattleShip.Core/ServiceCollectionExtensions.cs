@@ -1,7 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using HexMaster.BattleShip.Core.Cqrs;
 
-namespace HexMaster.BattleShip.Core;
+namespace HexMaster.BattleShip.Core.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {

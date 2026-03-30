@@ -1,4 +1,4 @@
-namespace HexMaster.BattleShip.Core;
+namespace HexMaster.BattleShip.Core.Cqrs;
 
 public interface ICommand<out TResult>
 {

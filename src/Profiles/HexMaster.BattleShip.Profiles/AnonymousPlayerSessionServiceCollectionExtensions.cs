@@ -1,6 +1,6 @@
 using Dapr.Client;
 using System.Reflection;
-using HexMaster.BattleShip.Core;
+using HexMaster.BattleShip.Core.DependencyInjection;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
 using HexMaster.BattleShip.Profiles.Abstractions.Services;
 using Microsoft.Extensions.Configuration;

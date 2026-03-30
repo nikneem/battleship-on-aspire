@@ -1,4 +1,6 @@
 using System.Text;
+using HexMaster.BattleShip.Games;
+using HexMaster.BattleShip.Games.Endpoints;
 using HexMaster.BattleShip.Profiles.Endpoints;
 using HexMaster.BattleShip.Profiles;
 using HexMaster.BattleShip.Profiles.Abstractions.Claims;
@@ -11,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+builder.Services.AddGamesModule();
 builder.Services.AddProfilesModule(builder.Configuration);
 
 var anonymousPlayerSessionOptions = builder.Configuration
@@ -53,6 +56,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGamesEndpoints();
 app.MapProfilesEndpoints();
 
 app.Run();

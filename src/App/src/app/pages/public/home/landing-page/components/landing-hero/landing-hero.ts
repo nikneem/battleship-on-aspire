@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { type GaugeReadout, type TelemetryItem } from '../../landing-page.models';
 import { LandingTerminal } from '../landing-terminal/landing-terminal';
 
 @Component({
   selector: 'bat-landing-hero',
-  imports: [LandingTerminal],
+  imports: [LandingTerminal, RouterLink],
   templateUrl: './landing-hero.html',
   styleUrl: './landing-hero.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

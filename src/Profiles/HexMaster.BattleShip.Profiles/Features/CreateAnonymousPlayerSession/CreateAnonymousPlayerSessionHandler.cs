@@ -1,4 +1,4 @@
-using HexMaster.BattleShip.Core;
+using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
 using HexMaster.BattleShip.Profiles.Abstractions.DataTransferObjects;
 using HexMaster.BattleShip.Profiles.Abstractions.Services;
