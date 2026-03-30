@@ -1,4 +1,4 @@
-d:---
+---
 description: "Use this agent when the user asks to validate, design, or refactor C# code to ensure it follows modular monolith architecture with strict CQRS and feature-driven design patterns.\n\nTrigger phrases include:\n- 'review this architecture'\n- 'is this following our domain patterns?'\n- 'how should I structure this feature?'\n- 'find architectural flaws'\n- 'validate the CQRS implementation'\n- 'check if this new module is structured correctly'\n- 'help me design this domain'\n\nExamples:\n- User says 'I'm building a new Games domain, how should I structure it?' → invoke this agent to design proper folder structure, namespace conventions, and CQRS setup\n- User asks 'Does this code violate our architecture?' → invoke this agent to analyze and identify domain boundary violations, improper dependencies, or namespace issues\n- During code review, user says 'check if this endpoint mapping is correct' → invoke this agent to validate proper use of MapGroup(), extension methods, and Endpoints namespace organization"
 name: csharp-architecture-enforcer
 ---
