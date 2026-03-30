@@ -1,3 +1,27 @@
 :host {
   display: block;
 }
+
+.page-radar-layer {
+  position: fixed;
+  top: 50%;
+  right: clamp(-6rem, -2vw, -1rem);
+  transform: translateY(-50%);
+  inline-size: min(42rem, 46vw);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.48;
+  filter: saturate(1.15);
+}
+
+.page-radar-layer bat-landing-radar {
+  display: block;
+}
+
+@media (max-width: 1100px) {
+  .page-radar-layer {
+    right: -8rem;
+    inline-size: min(28rem, 78vw);
+    opacity: 0.26;
+  }
+}

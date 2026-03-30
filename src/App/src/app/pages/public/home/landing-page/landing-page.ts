@@ -5,6 +5,7 @@ import { BattleOpsStyleSettingsService, type AccentIntensity, type DensityMode }
 import { LandingDoctrine } from './components/landing-doctrine/landing-doctrine';
 import { LandingHero } from './components/landing-hero/landing-hero';
 import { LandingMission } from './components/landing-mission/landing-mission';
+import { LandingRadar } from './components/landing-radar/landing-radar';
 import { LandingSettings } from './components/landing-settings/landing-settings';
 import { LandingSoundSettings } from './components/landing-sound-settings/landing-sound-settings';
 import { type GaugeReadout, type RadarContact } from './landing-page.models';
@@ -12,7 +13,7 @@ import { terminalMessages } from './terminal-messages';
 
 @Component({
   selector: 'bat-landing-page',
-  imports: [LandingHero, LandingSettings, LandingDoctrine, LandingMission, LandingSoundSettings],
+  imports: [LandingHero, LandingSettings, LandingDoctrine, LandingMission, LandingSoundSettings, LandingRadar],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

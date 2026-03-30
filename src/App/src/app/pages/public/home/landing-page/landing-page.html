@@ -1,9 +1,12 @@
+<div class="page-radar-layer" aria-hidden="true">
+  <bat-landing-radar [contacts]="radarContacts()" />
+</div>
+
 <main class="shell">
   <bat-landing-hero
     [telemetry]="telemetry()"
     [audioInstruction]="audioInstruction()"
     [gaugeReadouts]="gaugeReadouts()"
-    [radarContacts]="radarContacts()"
     [terminalFeed]="terminalFeed()"
   />
 

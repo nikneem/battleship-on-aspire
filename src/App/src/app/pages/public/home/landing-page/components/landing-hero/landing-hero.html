@@ -24,8 +24,6 @@
     </dl>
 
     <div class="hero-instrumentation">
-      <bat-landing-radar [contacts]="radarContacts()" />
-
       <div class="gauge-strip" aria-label="Animated gauges">
         @for (gauge of gaugeReadouts(); track gauge.label) {
           <article class="gauge-card">
