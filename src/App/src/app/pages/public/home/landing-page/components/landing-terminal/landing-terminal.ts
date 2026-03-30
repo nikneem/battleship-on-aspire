@@ -14,8 +14,11 @@ export class LandingTerminal {
   private typingTimer: number | null = null;
 
   readonly lines = input<readonly string[]>([]);
-  readonly historyLines = computed(() => this.lines().slice(-6, -1));
-  readonly activeLine = computed(() => this.lines().at(-1) ?? 'SCANNING FOR CONTACTS...');
+  readonly visitorInput = signal('');
+  readonly visitorMessages = signal<string[]>([]);
+  readonly combinedLines = computed(() => [...this.lines(), ...this.visitorMessages()]);
+  readonly historyLines = computed(() => this.combinedLines().slice(-6, -1));
+  readonly activeLine = computed(() => this.combinedLines().at(-1) ?? 'SCANNING FOR CONTACTS...');
   readonly typedLine = signal('');
 
   constructor() {
@@ -51,6 +54,25 @@ export class LandingTerminal {
     };
 
     this.typingTimer = view.setTimeout(writeNextCharacter, 140);
+  }
+
+  protected updateVisitorInput(event: Event): void {
+    const target = event.target;
+
+    if (target instanceof HTMLInputElement) {
+      this.visitorInput.set(target.value);
+    }
+  }
+
+  protected submitVisitorMessage(): void {
+    const normalizedMessage = this.visitorInput().trim();
+
+    if (normalizedMessage.length === 0) {
+      return;
+    }
+
+    this.visitorMessages.update((messages) => [...messages.slice(-4), `> ${normalizedMessage.toUpperCase()}`]);
+    this.visitorInput.set('');
   }
 
   private clearTypingTimer(): void {

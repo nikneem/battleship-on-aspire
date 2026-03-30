@@ -6,25 +6,29 @@
   display: grid;
   gap: 1rem;
   min-height: 100%;
+  border: 1px solid var(--battle-ops-electric-cyan);
+  background: var(--battle-ops-midnight-blue);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 229 255 / 0.08),
+    0 0 30px rgb(0 229 255 / 0.14);
 }
 
 .terminal-feed {
   display: grid;
   gap: 0.75rem;
   padding: 1rem;
-  background:
-    linear-gradient(180deg, rgb(2 8 14 / 0.96), rgb(3 10 16 / 0.92)),
-    var(--battle-ops-panel-base);
+  border: 1px solid rgb(0 229 255 / 0.16);
+  background: var(--battle-ops-midnight-blue);
   box-shadow: inset 0 0 0 1px rgb(102 242 255 / 0.05);
 }
 
 .terminal-feed p {
   margin: 0;
-  color: var(--battle-ops-text-primary);
+  color: var(--battle-ops-electric-cyan);
 }
 
 .typed-line {
-  color: var(--battle-ops-soft-aqua);
+  color: var(--battle-ops-electric-cyan);
 }
 
 .terminal-cursor {
@@ -33,8 +37,56 @@
   block-size: 1em;
   margin-inline-start: 0.18rem;
   vertical-align: text-bottom;
-  background: var(--battle-ops-soft-aqua);
+  background: var(--battle-ops-electric-cyan);
   animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
+.terminal-input {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.terminal-input__label {
+  color: var(--battle-ops-soft-aqua);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.terminal-input__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--battle-ops-electric-cyan);
+  background: var(--battle-ops-midnight-blue);
+  color: var(--battle-ops-electric-cyan);
+}
+
+.terminal-input__row input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--battle-ops-electric-cyan);
+}
+
+.terminal-input__row input::placeholder {
+  color: rgb(0 229 255 / 0.55);
+}
+
+.terminal-input__row button {
+  border: 1px solid var(--battle-ops-electric-cyan);
+  background: transparent;
+  color: var(--battle-ops-electric-cyan);
+  padding: 0.4rem 0.8rem;
+  text-transform: uppercase;
+}
+
+.terminal-input__row button:hover,
+.terminal-input__row button:focus-visible {
+  background: rgb(0 229 255 / 0.1);
 }
 
 @keyframes terminal-cursor-blink {

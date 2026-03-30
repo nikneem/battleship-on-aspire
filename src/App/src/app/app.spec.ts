@@ -57,4 +57,25 @@ describe('App', () => {
     expect(document.documentElement.dataset['motion']).toBe('reduced');
     expect(document.documentElement.dataset['density']).toBe('relaxed');
   });
+
+  it('should echo visitor terminal input into the landing page terminal', async () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const terminalInput = host.querySelector('#terminal-command') as HTMLInputElement | null;
+    const submitButton = host.querySelector('.terminal-input__row button') as HTMLButtonElement | null;
+
+    terminalInput!.value = 'hello captain';
+    terminalInput!.dispatchEvent(new Event('input'));
+    submitButton?.click();
+    fixture.detectChanges();
+    await new Promise((resolve) => window.setTimeout(resolve, 600));
+    fixture.detectChanges();
+
+    expect(host.textContent).toContain('> HELLO CAPTAIN');
+  });
 });
