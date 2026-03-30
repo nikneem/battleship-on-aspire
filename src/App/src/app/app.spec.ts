@@ -46,7 +46,7 @@ describe('App', () => {
     expect(localStorage.getItem('battle-ops-music-volume')).toBe('30');
   });
 
-  it('should persist style settings locally', async () => {
+  it('should focus the home page on playing Battleship', async () => {
     const fixture = TestBed.createComponent(App);
     const router = TestBed.inject(Router);
     await router.navigateByUrl('/');
@@ -54,19 +54,10 @@ describe('App', () => {
     await fixture.whenStable();
 
     const host = fixture.nativeElement as HTMLElement;
-    const motionToggle = host.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
-    const densityButtons = host.querySelectorAll('.option-chip');
-    const relaxedDensityButton = densityButtons.item(2) as HTMLButtonElement | null;
 
-    motionToggle?.click();
-    relaxedDensityButton?.click();
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    expect(localStorage.getItem('battle-ops-reduced-motion')).toBe('true');
-    expect(localStorage.getItem('battle-ops-density')).toBe('relaxed');
-    expect(document.documentElement.dataset['motion']).toBe('reduced');
-    expect(document.documentElement.dataset['density']).toBe('relaxed');
+    expect(host.textContent).not.toContain('TACTICAL SETTINGS');
+    expect(host.textContent).toContain('PLAY BATTLESHIP');
+    expect(host.textContent).toContain('playable Battleship experience');
   });
 
   it('should open sound settings and persist sound volumes locally', async () => {

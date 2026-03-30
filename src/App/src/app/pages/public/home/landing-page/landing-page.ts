@@ -1,19 +1,17 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { BattleOpsSoundSettingsService } from '../../../../battle-ops-sound-settings.service';
-import { BattleOpsStyleSettingsService, type AccentIntensity, type DensityMode } from '../../../../battle-ops-style-settings.service';
 import { LandingDoctrine } from './components/landing-doctrine/landing-doctrine';
 import { LandingHero } from './components/landing-hero/landing-hero';
 import { LandingMission } from './components/landing-mission/landing-mission';
 import { LandingRadar } from './components/landing-radar/landing-radar';
-import { LandingSettings } from './components/landing-settings/landing-settings';
 import { LandingSoundSettings } from './components/landing-sound-settings/landing-sound-settings';
 import { type GaugeReadout, type RadarContact } from './landing-page.models';
 import { terminalMessages } from './terminal-messages';
 
 @Component({
   selector: 'bat-landing-page',
-  imports: [LandingHero, LandingSettings, LandingDoctrine, LandingMission, LandingSoundSettings, LandingRadar],
+  imports: [LandingHero, LandingDoctrine, LandingMission, LandingSoundSettings, LandingRadar],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,7 +20,6 @@ import { terminalMessages } from './terminal-messages';
   }
 })
 export class LandingPage {
-  private readonly styleSettingsService = inject(BattleOpsStyleSettingsService);
   private readonly soundSettingsService = inject(BattleOpsSoundSettingsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly document = inject(DOCUMENT);
@@ -34,26 +31,16 @@ export class LandingPage {
   private interactionHandler: ((event: Event) => void) | null = null;
   private messageCursor = 0;
 
-  protected readonly settings = this.styleSettingsService.settings.asReadonly();
   protected readonly soundSettings = this.soundSettingsService.settings.asReadonly();
-  protected readonly densityOptions = [
-    { label: 'COMPACT', value: 'compact', hint: 'tight tactical spacing' },
-    { label: 'STANDARD', value: 'standard', hint: 'balanced command spacing' },
-    { label: 'RELAXED', value: 'relaxed', hint: 'expanded surface rhythm' }
-  ] as const;
-  protected readonly accentOptions = [
-    { label: 'STANDARD', value: 'standard', hint: 'precise cyan glow' },
-    { label: 'SURGE', value: 'surge', hint: 'elevated sonar energy' }
-  ] as const;
   protected readonly defenseStrategies = [
-    'Split the fleet to draw hostile pings away from the primary command lane.',
-    'Favor passive sonar first, then fire only when the contact crosses the reticle.',
-    'Use AI-assisted prompts to refine tactics before each engagement sequence.'
+    'Queue up a live Battleship board and track every hit, miss, and sunk ship from one command surface.',
+    'Use the sonar feed to stay locked on the latest moves before you commit your next shot.',
+    'Open the game, place your fleet, and start trading volleys as soon as the board is ready.'
   ] as const;
   protected readonly missionHighlights = [
-    'Teach AI-driven development through real delivery loops.',
-    'Show how Aspire coordinates supporting services across the solution.',
-    'Demonstrate disciplined frontend execution with modern Angular patterns.'
+    'Launch a playable Battleship match directly from the Battle Ops experience.',
+    'Deploy your fleet, call shots, and watch the tactical feed react in real time.',
+    'Use the landing page as the briefing room before you enter the actual game board.'
   ] as const;
   protected readonly terminalFeed = signal<string[]>([]);
   protected readonly gaugeReadouts = signal<GaugeReadout[]>([
@@ -68,15 +55,15 @@ export class LandingPage {
   ]);
   protected readonly sonarStatus = signal<'STANDBY' | 'BLOCKED' | 'ACTIVE'>('STANDBY');
   protected readonly telemetry = computed(() => [
-    { label: 'MOTION', value: this.settings().reducedMotion ? 'REDUCED' : 'FULL' },
-    { label: 'DENSITY', value: this.settings().density.toUpperCase() },
-    { label: 'ACCENT', value: this.settings().accentIntensity.toUpperCase() },
+    { label: 'GAME MODE', value: 'LIVE MATCH' },
+    { label: 'BOARD SIZE', value: '10 X 10' },
+    { label: 'PLAYER STATUS', value: 'READY' },
     { label: 'SONAR', value: this.sonarStatus() }
   ]);
   protected readonly audioInstruction = computed(() =>
     this.sonarStatus() === 'BLOCKED'
       ? 'Tap anywhere in the control station to arm sonar playback.'
-      : 'Ambient sonar pulses cycle every 10 to 15 seconds when permitted by the browser.'
+      : 'Arm your fleet, open the sonar feed, and then jump into a Battleship match.'
   );
 
   constructor() {
@@ -126,22 +113,6 @@ export class LandingPage {
         this.audio.removeEventListener('ended', this.handleSonarEnd);
       }
     });
-  }
-
-  protected updateReducedMotion(event: Event): void {
-    const target = event.target;
-
-    if (target instanceof HTMLInputElement) {
-      this.styleSettingsService.setReducedMotion(target.checked);
-    }
-  }
-
-  protected setDensity(value: DensityMode): void {
-    this.styleSettingsService.setDensity(value);
-  }
-
-  protected setAccentIntensity(value: AccentIntensity): void {
-    this.styleSettingsService.setAccentIntensity(value);
   }
 
   protected setEffectsVolume(value: number): void {

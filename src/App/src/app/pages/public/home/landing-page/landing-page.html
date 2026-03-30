@@ -14,18 +14,7 @@
     </div>
   </section>
 
-  <section class="content-stack" aria-label="Landing page tactical panels">
-    <div class="content-row">
-      <bat-landing-settings
-        [settings]="settings()"
-        [densityOptions]="densityOptions"
-        [accentOptions]="accentOptions"
-        (reducedMotionChange)="updateReducedMotion($event)"
-        (densityChange)="setDensity($event)"
-        (accentIntensityChange)="setAccentIntensity($event)"
-      />
-    </div>
-
+  <section class="content-stack" aria-label="Landing page information panels">
     <div class="content-row">
       <bat-landing-doctrine [strategies]="defenseStrategies" />
     </div>
