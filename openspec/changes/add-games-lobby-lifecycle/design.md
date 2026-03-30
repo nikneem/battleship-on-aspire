@@ -2,11 +2,14 @@
 
 The repository already separates `Games`, `Games.Abstractions`, `Profiles`, `Realtime`, and the API host, but the `Games` module is still a placeholder. This change introduces the first real Battleship workflow and needs to establish a stable domain boundary that can later support persistence, realtime updates, and player-facing APIs without leaking hidden board state.
 
+GitHub issue `#1` also fixes the first end-to-end host journey: a visitor starts from a create-game entry point, enters a player name, optionally supplies a lobby password, triggers profile creation, creates a game, and is navigated into `/games/{game-code}`.
+
 The repository also has an architectural expectation that HTTP endpoints accept and return DTOs from `Abstractions.DataTransferObjects`, then map those DTOs to commands and queries. The design therefore needs to define clear application messages, caller-aware read models, and an aggregate that owns the core game invariants.
 
 ## Goals / Non-Goals
 
 **Goals:**
+- Support the visitor-to-host create-game flow described in GitHub issue `#1`.
 - Define a `Game` aggregate that owns the lobby lifecycle and the active Battleship match lifecycle.
 - Support host-created lobbies with a public game code and an optional join secret.
 - Ensure secret-protected joins are secure and do not require storing or returning raw secrets.
@@ -35,7 +38,7 @@ Alternative considered: modeling every intermediate state as a separate phase, s
 
 ### Model join code as public and join secret as hashed
 
-`GameCode` will be a public, unique, shareable value object. The optional join secret will never be stored in raw form. Only a password hash and a derived `IsProtected` flag are persisted on the aggregate.
+`GameCode` will be a public, unique, shareable 8-digit value object generated on the server. The optional join secret will never be stored in raw form. Only a password hash and a derived `IsProtected` flag are persisted on the aggregate.
 
 Handlers may verify a raw join secret by using a dedicated hasher/verifier abstraction and then call the aggregate with proof that the secret was valid. API DTOs and read models expose only `GameCode` and `IsProtected`, never the stored hash or raw secret.
 
@@ -53,6 +56,18 @@ The design assumes explicit commands such as `CreateGame`, `JoinGameByCode`, `Ma
 
 Alternative considered: thin endpoints calling domain methods directly. That would not match the repository’s intended CQRS direction and would make evolution of validation, telemetry, and persistence harder.
 
+### Treat player-profile establishment as a prerequisite to host creation
+
+The UI flow should not allow the visitor to submit `CreateGame` until a valid player name has been accepted and a player profile has been established. The game-creation command therefore receives a player identity that already exists, while the create-game UI orchestrates profile establishment before enabling final submission.
+
+Alternative considered: letting `CreateGame` both create the player profile and create the game in one command. That would blur module boundaries between `Profiles` and `Games` and make retries and validation harder to reason about.
+
+### Return enough creation result data for route handoff
+
+The create-game flow should return the generated game code and any identifiers the client needs to navigate directly into `/games/{game-code}` as the host. This keeps the route handoff deterministic and avoids requiring an extra lobby lookup after creation succeeds.
+
+Alternative considered: forcing the client to re-query for the newly created lobby after submit. That adds a redundant round-trip and complicates error handling for the first-host experience.
+
 ### Start active play automatically when both fleets are locked
 
 When both players have submitted valid fleets and locked their boards, the aggregate transitions from `Setup` to `InProgress` without a separate explicit start command. This keeps the workflow deterministic and avoids creating an extra orchestration step that has no independent business meaning.
@@ -64,6 +79,7 @@ Alternative considered: adding `StartGameCommand`. That adds another command pat
 - [Concurrency on join or fire commands] -> Use optimistic concurrency at the persistence boundary so only one guest can fill the second slot and duplicate turn actions are rejected cleanly.
 - [Leaking opponent board state in queries] -> Use caller-specific DTOs and dedicated query handlers rather than returning domain objects directly.
 - [Secret verification drifting into endpoints] -> Keep secret verification in application handlers behind an abstraction so the aggregate remains secret-agnostic but invariants stay enforced.
+- [Profile creation and game creation becoming tightly coupled] -> Keep profile establishment in the surrounding application flow so the `Games` module depends on a player identifier, not on `Profiles` internals.
 - [State machine becoming too coarse] -> Keep subordinate readiness and board-lock state explicit on `PlayerSlot` and `Board`, with tests covering transition guards.
 - [Terminal-state semantics around abandonment] -> Define and document when abandonment results in a forfeit win versus a neutral terminated game before implementation starts.
 

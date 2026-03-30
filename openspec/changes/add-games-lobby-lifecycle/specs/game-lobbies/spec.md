@@ -1,20 +1,46 @@
+<!-- openspec:github-issue nikneem/battleship-on-aspire#1 -->
+> Synced from GitHub issue #1 by manual import.
+
 ## ADDED Requirements
 
+### Requirement: Visitors can enter the create-game flow
+The system SHALL provide a create-game entry flow where a visitor can navigate from the landing page to a create-game route, enter a player name, and optionally provide a lobby password before creating a game.
+
+#### Scenario: Navigate from the landing page to create a game
+- **WHEN** a visitor selects the create-game call to action from the landing page
+- **THEN** the client navigates the visitor to the create-game route
+- **AND** the create-game form is displayed with fields for player name and an optional lobby password
+
+#### Scenario: Enable game creation only after player setup
+- **WHEN** the visitor enters a valid player name in the create-game flow
+- **THEN** the surrounding application establishes the player profile needed for hosting
+- **AND** the create-game action becomes enabled only after that prerequisite succeeds
+
 ### Requirement: Host can create a game lobby
-The system SHALL allow a player to create a Battleship game lobby that reserves the host as the first participant, assigns a unique public game code, and optionally protects the lobby with a join secret.
+The system SHALL allow a player to create a Battleship game lobby that reserves the host as the first participant, assigns a unique server-generated 8-digit public game code, and optionally protects the lobby with a join secret.
 
 #### Scenario: Create an open lobby
 - **WHEN** a player creates a lobby without a join secret
 - **THEN** the system creates a lobby in the `LobbyOpen` phase
-- **AND** the system assigns a unique public game code
+- **AND** the system assigns a unique server-generated 8-digit public game code
 - **AND** the lobby is marked as not protected
 
 #### Scenario: Create a protected lobby
 - **WHEN** a player creates a lobby with a join secret
 - **THEN** the system creates a lobby in the `LobbyOpen` phase
-- **AND** the system assigns a unique public game code
+- **AND** the system assigns a unique server-generated 8-digit public game code
 - **AND** the lobby is marked as protected
 - **AND** the raw join secret is not returned in subsequent lobby state responses
+
+#### Scenario: Host is added to game state at creation time
+- **WHEN** a player successfully creates a game lobby
+- **THEN** the system adds that player as the host participant in server-side game state
+- **AND** the creation result includes the generated game code needed for host navigation
+
+#### Scenario: Navigate into the created game
+- **WHEN** the create-game request succeeds
+- **THEN** the client navigates the host to `/games/{game-code}`
+- **AND** `{game-code}` matches the server-generated code for the created lobby
 
 ### Requirement: Guest can join a lobby by game code
 The system SHALL allow a second player to join an open lobby by supplying the lobby game code, provided the lobby is still joinable and the joining player is distinct from the host.
