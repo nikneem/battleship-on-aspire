@@ -7,17 +7,25 @@
     [terminalFeed]="terminalFeed()"
   />
 
-  <section class="content-grid" aria-label="Landing page tactical panels">
-    <bat-landing-settings
-      [settings]="settings()"
-      [densityOptions]="densityOptions"
-      [accentOptions]="accentOptions"
-      (reducedMotionChange)="updateReducedMotion($event)"
-      (densityChange)="setDensity($event)"
-      (accentIntensityChange)="setAccentIntensity($event)"
-    />
-    <bat-landing-doctrine [strategies]="defenseStrategies" />
-    <bat-landing-mission [missionHighlights]="missionHighlights" />
+  <section class="content-stack" aria-label="Landing page tactical panels">
+    <div class="content-row">
+      <bat-landing-settings
+        [settings]="settings()"
+        [densityOptions]="densityOptions"
+        [accentOptions]="accentOptions"
+        (reducedMotionChange)="updateReducedMotion($event)"
+        (densityChange)="setDensity($event)"
+        (accentIntensityChange)="setAccentIntensity($event)"
+      />
+    </div>
+
+    <div class="content-row">
+      <bat-landing-doctrine [strategies]="defenseStrategies" />
+    </div>
+
+    <div class="content-row">
+      <bat-landing-mission [missionHighlights]="missionHighlights" />
+    </div>
   </section>
 </main>
 
