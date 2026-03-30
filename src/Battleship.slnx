@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Aspire/">
+    <Project Path="Aspire/HexMaster.BattleShip.Aspire.AppHost/HexMaster.BattleShip.Aspire.AppHost.csproj" Id="1279226d-340b-499a-91b6-beaf0daf61de" />
+    <Project Path="Aspire/HexMaster.BattleShip.Aspire.ServiceDefaults/HexMaster.BattleShip.Aspire.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Games/">
+    <Project Path="Games/HexMaster.BattleShip.Games.Abstractions/HexMaster.BattleShip.Games.Abstractions.csproj" Id="4dc72fc1-0cd7-42b1-95bb-a6c1e1015fc1" />
+    <Project Path="Games/HexMaster.BattleShip.Games.Tests/HexMaster.BattleShip.Games.Tests.csproj" Id="176571f8-1071-4fec-b07b-40b1704bee59" />
+    <Project Path="Games/HexMaster.BattleShip.Games/HexMaster.BattleShip.Games.csproj" Id="0789b37b-e60d-49b3-986f-3f09d47c5c78" />
+  </Folder>
+  <Folder Name="/Profiles/">
+    <Project Path="Profiles/HexMaster.BattleShip.Profiles.Abstractions/HexMaster.BattleShip.Profiles.Abstractions.csproj" Id="75c94f67-c6b0-40d7-98d0-6317e7867014" />
+    <Project Path="Profiles/HexMaster.BattleShip.Profiles.Tests/HexMaster.BattleShip.Profiles.Tests.csproj" Id="38151d06-25c2-4344-9ce7-e43d0a5bbd90" />
+    <Project Path="Profiles/HexMaster.BattleShip.Profiles/HexMaster.BattleShip.Profiles.csproj" Id="b105eed7-202f-47b0-84e2-e169298f80cd" />
+  </Folder>
+  <Folder Name="/Realtime/">
+    <Project Path="Realtime/HexMaster.BattleShip.Realtime.Abstractions/HexMaster.BattleShip.Realtime.Abstractions.csproj" Id="a764e35f-6a29-421e-9cbb-acc9ae4d6edd" />
+    <Project Path="Realtime/HexMaster.BattleShip.Realtime.Tests/HexMaster.BattleShip.Realtime.Tests.csproj" Id="31f931d0-81e7-4981-837c-173519a3a275" />
+    <Project Path="Realtime/HexMaster.BattleShip.Realtime/HexMaster.BattleShip.Realtime.csproj" Id="e8323c69-ad7b-49ec-9c47-11981efba16b" />
+  </Folder>
+  <Project Path="HexMaster.BattleShip.Api/HexMaster.BattleShip.Api.csproj" />
+</Solution>

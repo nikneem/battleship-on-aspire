@@ -1,0 +1,47 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+TestResults/
+
+# .NET coverage and test artifacts
+*.coverage
+*.coveragexml
+coverage/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# Frontend artifacts
+node_modules/
+.angular/
+dist/
+
+# IDE and editor folders
+.vs/
+.vscode/
+
+# Visual Studio user-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
