@@ -54,12 +54,6 @@ export class LandingPage {
     { id: 'charlie', top: '70%', left: '57%', coordinates: 'C8', code: 'NOVA-88', pulseDelay: '1.6s' }
   ]);
   protected readonly sonarStatus = signal<'STANDBY' | 'BLOCKED' | 'ACTIVE'>('STANDBY');
-  protected readonly telemetry = computed(() => [
-    { label: 'GAME MODE', value: 'LIVE MATCH' },
-    { label: 'BOARD SIZE', value: '10 X 10' },
-    { label: 'PLAYER STATUS', value: 'READY' },
-    { label: 'SONAR', value: this.sonarStatus() }
-  ]);
   protected readonly audioInstruction = computed(() =>
     this.sonarStatus() === 'BLOCKED'
       ? 'Tap anywhere in the control station to arm sonar playback.'

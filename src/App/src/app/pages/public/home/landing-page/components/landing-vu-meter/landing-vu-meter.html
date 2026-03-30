@@ -1,0 +1,24 @@
+<article class="vu-meter-card tactical-panel">
+  <div class="vu-meter-card__copy">
+    <div>
+      <p class="vu-meter-card__eyebrow">{{ label() }}</p>
+      <h2 class="vu-meter-card__status">{{ status() }}</h2>
+    </div>
+
+    <p class="vu-meter-card__value">{{ normalizedValue() }}%</p>
+  </div>
+
+  <div class="vu-meter-display" [attr.aria-label]="label() + ' at ' + normalizedValue() + ' percent'" role="img">
+    @for (bar of bars(); track bar.index) {
+      <div class="vu-meter-bar" aria-hidden="true">
+        @for (cellIndex of cellIndexes; track cellIndex) {
+          <span
+            class="vu-meter-cell"
+            [class.is-active]="cellIndex < bar.activeCells"
+            [class.is-peak]="bar.peakCellIndex === cellIndex"
+          ></span>
+        }
+      </div>
+    }
+  </div>
+</article>

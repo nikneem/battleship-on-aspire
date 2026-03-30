@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+
+import { BattleOpsBackgroundMusicService } from './battle-ops-background-music.service';
 
 @Component({
   selector: 'bat-root',
@@ -8,4 +10,8 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class App {}
+export class App {
+  private readonly backgroundMusicService = inject(BattleOpsBackgroundMusicService);
+
+  protected readonly soundtrackReady = this.backgroundMusicService;
+}

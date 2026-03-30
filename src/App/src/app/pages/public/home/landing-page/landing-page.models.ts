@@ -4,11 +4,6 @@ export interface GaugeReadout {
   readonly status: string;
 }
 
-export interface TelemetryItem {
-  readonly label: string;
-  readonly value: string;
-}
-
 export interface RadarContact {
   readonly id: string;
   readonly top: string;

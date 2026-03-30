@@ -13,38 +13,15 @@
     </div>
 
     <p class="status-note">{{ audioInstruction() }}</p>
-
-    <dl class="telemetry-grid" aria-label="Command telemetry">
-      @for (item of telemetry(); track item.label) {
-        <div class="telemetry-card">
-          <dt>{{ item.label }}</dt>
-          <dd>{{ item.value }}</dd>
-        </div>
-      }
-    </dl>
-
-    <div class="hero-instrumentation">
-      <div class="gauge-strip" aria-label="Animated gauges">
-        @for (gauge of gaugeReadouts(); track gauge.label) {
-          <article class="gauge-card">
-            <div
-              class="gauge-meter"
-              [style.--gauge-value]="gauge.value"
-              [attr.aria-label]="gauge.label + ' at ' + gauge.value + ' percent'"
-            >
-              <div class="gauge-arc"></div>
-              <div class="gauge-needle"></div>
-              <strong>{{ gauge.value }}%</strong>
-            </div>
-            <div class="gauge-copy">
-              <span>{{ gauge.label }}</span>
-              <small>{{ gauge.status }}</small>
-            </div>
-          </article>
-        }
-      </div>
-    </div>
   </div>
 
   <bat-landing-terminal class="hero-terminal" [lines]="terminalFeed()" />
+
+  <div class="hero-instrumentation">
+    <div class="gauge-strip" aria-label="Animated status meters">
+      @for (gauge of gaugeReadouts(); track gauge.label) {
+        <bat-landing-vu-meter [label]="gauge.label" [status]="gauge.status" [value]="gauge.value"></bat-landing-vu-meter>
+      }
+    </div>
+  </div>
 </section>

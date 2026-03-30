@@ -12,8 +12,11 @@
   "packageManager": "npm@11.5.2",
   "dependencies": {
     "@angular/animations": "^21.2.0",
+    "@angular/build": "^21.2.5",
+    "@angular/cli": "^21.2.5",
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
+    "@angular/compiler-cli": "^21.2.0",
     "@angular/core": "^21.2.0",
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
@@ -22,15 +25,12 @@
     "primeicons": "^7.0.0",
     "primeng": "^21.1.4",
     "rxjs": "~7.8.0",
+    "typescript": "~5.9.2",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.2.5",
-    "@angular/cli": "^21.2.5",
-    "@angular/compiler-cli": "^21.2.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
-    "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }
 }

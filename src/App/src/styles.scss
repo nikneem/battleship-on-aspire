@@ -214,8 +214,6 @@ bat-root {
 
 :where(.landing-page-host) .eyebrow,
 :where(.landing-page-host) .panel-kicker,
-:where(.landing-page-host) .telemetry-card dt,
-:where(.landing-page-host) .gauge-copy span,
 :where(.landing-page-host) .mission-card span {
   color: var(--battle-ops-soft-aqua);
   font-size: 0.75rem;
@@ -226,8 +224,7 @@ bat-root {
 :where(.landing-page-host) h1,
 :where(.landing-page-host) h2,
 :where(.landing-page-host) h3,
-:where(.landing-page-host) .telemetry-card dd,
-:where(.landing-page-host) .gauge-meter strong {
+:where(.landing-page-host) .vu-meter-card__value {
   margin: 0;
   text-transform: uppercase;
 }
@@ -261,15 +258,10 @@ bat-root {
   gap: 0.75rem;
 }
 
-:where(.landing-page-host) .telemetry-grid,
 :where(.landing-page-host) .content-stack,
 :where(.landing-page-host) .mission-grid {
   display: grid;
   gap: 1rem;
-}
-
-:where(.landing-page-host) .telemetry-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 :where(.landing-page-host) .content-stack {
@@ -284,23 +276,12 @@ bat-root {
   inline-size: 100%;
 }
 
-:where(.landing-page-host) .telemetry-card,
-:where(.landing-page-host) .gauge-card,
+:where(.landing-page-host) .vu-meter-card,
 :where(.landing-page-host) .mission-card,
 :where(.landing-page-host) .terminal-feed,
 :where(.landing-page-host) .radar-console {
   border: 1px solid var(--battle-ops-border-color);
   background: var(--battle-ops-panel-elevated);
-}
-
-:where(.landing-page-host) .telemetry-card {
-  padding: var(--battle-ops-panel-padding);
-}
-
-:where(.landing-page-host) .telemetry-card dd {
-  color: var(--battle-ops-text-primary);
-  font-size: 1rem;
-  margin-top: 0.35rem;
 }
 
 :where(.landing-page-host) .panel-heading {
@@ -394,8 +375,7 @@ bat-root {
 @media (max-width: 1100px) {
   :where(.landing-page-host) .hero-panel,
   :where(.landing-page-host) .mission-grid,
-  :where(.landing-page-host) .gauge-strip,
-  :where(.landing-page-host) .telemetry-grid {
+  :where(.landing-page-host) .gauge-strip {
     grid-template-columns: 1fr;
   }
 
