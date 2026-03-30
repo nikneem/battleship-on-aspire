@@ -147,7 +147,9 @@
 .hero-terminal {
   justify-self: end;
   align-self: stretch;
-  inline-size: min(100%, 26rem);
+  inline-size: min(100%, 24rem);
+  block-size: fit-content;
+  max-block-size: min(50vh, 28rem);
 }
 
 @media (max-width: 1100px) {
