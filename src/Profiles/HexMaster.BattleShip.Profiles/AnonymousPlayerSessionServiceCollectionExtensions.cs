@@ -1,6 +1,7 @@
 using Dapr.Client;
+using System.Reflection;
+using HexMaster.BattleShip.Core;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
-using HexMaster.BattleShip.Profiles.Abstractions.Handlers;
 using HexMaster.BattleShip.Profiles.Abstractions.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,10 +35,10 @@ public static class AnonymousPlayerSessionServiceCollectionExtensions
 
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton(static _ => new DaprClientBuilder().Build());
-        services.AddScoped<IAnonymousPlayerSessionStore, DaprAnonymousPlayerSessionStore>();
+        services.AddScoped<IAnonymousPlayerSessionRepository, DaprAnonymousPlayerSessionRepository>();
         services.AddSingleton<IAnonymousPlayerTokenIssuer, JwtAnonymousPlayerTokenIssuer>();
-        services.AddScoped<ICreateAnonymousPlayerSessionCommandHandler, CreateAnonymousPlayerSessionCommandHandler>();
-        services.AddScoped<IRenewAnonymousPlayerSessionCommandHandler, RenewAnonymousPlayerSessionCommandHandler>();
+        services.AddSingleton<AnonymousPlayerTokenReader>();
+        services.AddHandlersFromAssembly(Assembly.GetExecutingAssembly());
 
         return services;
     }

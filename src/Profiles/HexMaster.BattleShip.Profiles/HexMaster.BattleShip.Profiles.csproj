@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HexMaster.BattleShip.Core\HexMaster.BattleShip.Core.csproj" />
     <ProjectReference Include="..\HexMaster.BattleShip.Profiles.Abstractions\HexMaster.BattleShip.Profiles.Abstractions.csproj" />
   </ItemGroup>
 

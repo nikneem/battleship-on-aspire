@@ -4,7 +4,7 @@ using System.Text;
 using HexMaster.BattleShip.Profiles.Abstractions.Claims;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
 using HexMaster.BattleShip.Profiles.Abstractions.DataTransferObjects;
-using HexMaster.BattleShip.Profiles.Abstractions.Models;
+using HexMaster.BattleShip.Profiles.Abstractions.DomainModels;
 using HexMaster.BattleShip.Profiles.Abstractions.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,17 +16,17 @@ public sealed class JwtAnonymousPlayerTokenIssuer(
 {
     private static readonly JwtSecurityTokenHandler JwtSecurityTokenHandler = new();
 
-    public AnonymousPlayerSessionResponseDto IssueToken(AnonymousPlayerRecord record, DateTimeOffset issuedAtUtc)
+    public AnonymousPlayerSessionResponseDto IssueToken(IAnonymousPlayerSession session, DateTimeOffset issuedAtUtc)
     {
         var requestedExpiration = issuedAtUtc.Add(options.Value.AccessTokenLifetime);
-        var expiresAtUtc = requestedExpiration <= record.ExpiresAtUtc
+        var expiresAtUtc = requestedExpiration <= session.ExpiresAtUtc
             ? requestedExpiration
-            : record.ExpiresAtUtc;
+            : session.ExpiresAtUtc;
 
         var identity = new ClaimsIdentity(
         [
-            new Claim(JwtRegisteredClaimNames.Sub, record.PlayerId),
-            new Claim(AnonymousPlayerClaimNames.PlayerName, record.PlayerName),
+            new Claim(JwtRegisteredClaimNames.Sub, session.PlayerId),
+            new Claim(AnonymousPlayerClaimNames.PlayerName, session.PlayerName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N"))
         ]);
 
@@ -46,8 +46,8 @@ public sealed class JwtAnonymousPlayerTokenIssuer(
         });
 
         return new AnonymousPlayerSessionResponseDto(
-            record.PlayerId,
-            record.PlayerName,
+            session.PlayerId,
+            session.PlayerName,
             JwtSecurityTokenHandler.WriteToken(token),
             expiresAtUtc);
     }

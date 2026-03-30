@@ -1,5 +1,5 @@
 using System.Text;
-using HexMaster.BattleShip.Api;
+using HexMaster.BattleShip.Profiles.Endpoints;
 using HexMaster.BattleShip.Profiles;
 using HexMaster.BattleShip.Profiles.Abstractions.Claims;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
