@@ -1,0 +1,138 @@
+:host {
+  display: block;
+}
+
+.radar-console {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  min-height: 24rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgb(102 242 255 / 0.22);
+  background:
+    radial-gradient(circle at center, rgb(0 229 255 / 0.18), transparent 22%),
+    radial-gradient(circle at center, rgb(5 12 19 / 0.96), rgb(4 10 16 / 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgb(102 242 255 / 0.08),
+    0 0 30px rgb(0 229 255 / 0.14);
+}
+
+.radar-background {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.radar-ring,
+.radar-crosshair,
+.radar-sweep-line {
+  position: absolute;
+}
+
+.radar-ring {
+  border: 1px solid rgb(102 242 255 / 0.12);
+  border-radius: 50%;
+}
+
+.radar-ring--outer {
+  inset: 8%;
+}
+
+.radar-ring--middle {
+  inset: 24%;
+}
+
+.radar-ring--inner {
+  inset: 38%;
+}
+
+.radar-crosshair {
+  background: rgb(102 242 255 / 0.12);
+}
+
+.radar-crosshair--vertical {
+  top: 10%;
+  bottom: 10%;
+  left: calc(50% - 0.5px);
+  width: 1px;
+}
+
+.radar-crosshair--horizontal {
+  left: 10%;
+  right: 10%;
+  top: calc(50% - 0.5px);
+  height: 1px;
+}
+
+.radar-sweep-line {
+  left: 50%;
+  top: 50%;
+  width: 42%;
+  height: 2px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgb(0 229 255 / 0.95), rgb(0 229 255 / 0.08));
+  box-shadow: 0 0 18px rgb(0 229 255 / 0.3);
+  animation: radar-sweep-clockwise 7s linear infinite;
+}
+
+.radar-contact {
+  position: absolute;
+  display: grid;
+  gap: 0.25rem;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.radar-contact__dot {
+  inline-size: 0.7rem;
+  block-size: 0.7rem;
+  border-radius: 50%;
+  background: rgb(102 242 255 / 0.42);
+  box-shadow: 0 0 10px rgb(0 229 255 / 0.18);
+  animation: radar-contact-pulse 2.4s ease-in-out infinite;
+}
+
+.radar-contact__label {
+  margin-left: 0.85rem;
+  color: rgb(102 242 255 / 0.9);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgb(0 229 255 / 0.18);
+  white-space: nowrap;
+}
+
+.radar-console img {
+  position: relative;
+  z-index: 1;
+  width: min(40%, 11rem);
+  filter: drop-shadow(0 0 24px var(--battle-ops-glow-color));
+  pointer-events: none;
+}
+
+@keyframes radar-sweep-clockwise {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes radar-contact-pulse {
+  0%,
+  100% {
+    background: rgb(102 242 255 / 0.38);
+    box-shadow: 0 0 10px rgb(0 229 255 / 0.14);
+    transform: scale(1);
+  }
+
+  50% {
+    background: var(--battle-ops-electric-cyan);
+    box-shadow: 0 0 18px rgb(0 229 255 / 0.4);
+    transform: scale(1.45);
+  }
+}

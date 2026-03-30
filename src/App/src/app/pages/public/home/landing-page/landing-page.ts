@@ -5,7 +5,7 @@ import { LandingDoctrine } from './components/landing-doctrine/landing-doctrine'
 import { LandingHero } from './components/landing-hero/landing-hero';
 import { LandingMission } from './components/landing-mission/landing-mission';
 import { LandingSettings } from './components/landing-settings/landing-settings';
-import { type GaugeReadout } from './landing-page.models';
+import { type GaugeReadout, type RadarContact } from './landing-page.models';
 import { terminalMessages } from './terminal-messages';
 
 @Component({
@@ -55,6 +55,11 @@ export class LandingPage {
     { label: 'HULL INTEGRITY', value: 92, status: 'STABLE' },
     { label: 'SONAR GAIN', value: 74, status: 'TRACKING' },
     { label: 'REACTOR LOAD', value: 61, status: 'BALANCED' }
+  ]);
+  protected readonly radarContacts = signal<RadarContact[]>([
+    { id: 'alpha', top: '26%', left: '62%', coordinates: 'D4', code: 'SABLE-17', pulseDelay: '0s' },
+    { id: 'bravo', top: '58%', left: '30%', coordinates: 'H7', code: 'EMBER-42', pulseDelay: '0.9s' },
+    { id: 'charlie', top: '70%', left: '57%', coordinates: 'C8', code: 'NOVA-88', pulseDelay: '1.6s' }
   ]);
   protected readonly sonarStatus = signal<'STANDBY' | 'BLOCKED' | 'ACTIVE'>('STANDBY');
   protected readonly telemetry = computed(() => [

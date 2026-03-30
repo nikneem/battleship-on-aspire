@@ -24,20 +24,7 @@
     </dl>
 
     <div class="hero-instrumentation">
-      <div class="radar-console" aria-label="Rotating radar display">
-        <div class="radar-grid"></div>
-        <div class="radar-sweep"></div>
-        <span class="radar-contact radar-contact--alpha"></span>
-        <span class="radar-contact radar-contact--bravo"></span>
-        <span class="radar-contact radar-contact--charlie"></span>
-        <img
-          ngSrc="branding/battle-ops-hero.svg"
-          width="240"
-          height="240"
-          alt="Battle Ops command insignia over the radar display"
-          priority
-        />
-      </div>
+      <bat-landing-radar [contacts]="radarContacts()" />
 
       <div class="gauge-strip" aria-label="Animated gauges">
         @for (gauge of gaugeReadouts(); track gauge.label) {

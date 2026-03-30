@@ -1,0 +1,25 @@
+<div class="radar-console" aria-label="Rotating radar display">
+  <div class="radar-background">
+    <div class="radar-ring radar-ring--outer"></div>
+    <div class="radar-ring radar-ring--middle"></div>
+    <div class="radar-ring radar-ring--inner"></div>
+    <div class="radar-crosshair radar-crosshair--vertical"></div>
+    <div class="radar-crosshair radar-crosshair--horizontal"></div>
+    <div class="radar-sweep-line"></div>
+  </div>
+
+  @for (contact of contacts(); track contact.id) {
+    <div class="radar-contact" [style.top]="contact.top" [style.left]="contact.left">
+      <span class="radar-contact__dot" [style.animation-delay]="contact.pulseDelay"></span>
+      <span class="radar-contact__label">{{ contact.coordinates }} // {{ contact.code }}</span>
+    </div>
+  }
+
+  <img
+    ngSrc="branding/battle-ops-hero.svg"
+    width="240"
+    height="240"
+    alt="Battle Ops command insignia over the radar display"
+    priority
+  />
+</div>
