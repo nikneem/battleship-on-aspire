@@ -1,0 +1,65 @@
+<article class="tactical-panel settings-panel" aria-labelledby="settings-title">
+  <div class="panel-heading">
+    <p class="panel-kicker">COMMAND PROFILE</p>
+    <h2 id="settings-title">TACTICAL SETTINGS</h2>
+  </div>
+
+  <div class="setting-group">
+    <div class="setting-copy">
+      <h3>REDUCED MOTION</h3>
+      <p>Suppress sweep and pulse effects while preserving the submarine control-station atmosphere.</p>
+    </div>
+
+    <label class="toggle-row">
+      <span>{{ settings().reducedMotion ? 'REDUCED' : 'STANDARD' }}</span>
+      <input
+        type="checkbox"
+        [checked]="settings().reducedMotion"
+        (change)="updateReducedMotion($event)"
+        aria-label="Toggle reduced motion"
+      />
+    </label>
+  </div>
+
+  <div class="setting-group">
+    <div class="setting-copy">
+      <h3>DENSITY</h3>
+      <p>Choose the tactical spacing profile for every command surface.</p>
+    </div>
+
+    <div class="chip-group" role="group" aria-label="Select density profile">
+      @for (option of densityOptions(); track option.value) {
+        <button
+          type="button"
+          class="option-chip"
+          [class.is-selected]="settings().density === option.value"
+          (click)="updateDensity(option.value)"
+        >
+          <span>{{ option.label }}</span>
+          <small>{{ option.hint }}</small>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="setting-group">
+    <div class="setting-copy">
+      <h3>ACCENT INTENSITY</h3>
+      <p>Control how aggressively the sonar glow energizes the interface.</p>
+    </div>
+
+    <div class="chip-group" role="group" aria-label="Select accent intensity">
+      @for (option of accentOptions(); track option.value) {
+        <button
+          type="button"
+          class="option-chip"
+          [class.is-selected]="settings().accentIntensity === option.value"
+          (click)="updateAccentIntensity(option.value)"
+        >
+          <span>{{ option.label }}</span>
+          <small>{{ option.hint }}</small>
+        </button>
+      }
+    </div>
+  </div>
+</article>

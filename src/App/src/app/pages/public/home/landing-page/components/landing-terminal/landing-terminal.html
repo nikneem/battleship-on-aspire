@@ -1,0 +1,14 @@
+<article class="tactical-panel terminal-panel" id="terminal" aria-labelledby="terminal-title">
+  <div class="panel-heading">
+    <p class="panel-kicker">ACTIVE CONTACTS</p>
+    <h2 id="terminal-title">TACTICAL TERMINAL</h2>
+  </div>
+
+  <div class="terminal-feed" role="log" aria-live="polite">
+    @for (line of historyLines(); track line) {
+      <p>{{ line }}</p>
+    }
+
+    <p class="typed-line">{{ typedLine() }}<span class="terminal-cursor" aria-hidden="true"></span></p>
+  </div>
+</article>

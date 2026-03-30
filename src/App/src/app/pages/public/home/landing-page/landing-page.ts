@@ -1,17 +1,16 @@
-import { DOCUMENT, NgOptimizedImage } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { BattleOpsStyleSettingsService, type AccentIntensity, type DensityMode } from '../../../../battle-ops-style-settings.service';
+import { LandingDoctrine } from './components/landing-doctrine/landing-doctrine';
+import { LandingHero } from './components/landing-hero/landing-hero';
+import { LandingMission } from './components/landing-mission/landing-mission';
+import { LandingSettings } from './components/landing-settings/landing-settings';
+import { type GaugeReadout } from './landing-page.models';
 import { terminalMessages } from './terminal-messages';
-
-interface GaugeReadout {
-  readonly label: string;
-  readonly value: number;
-  readonly status: string;
-}
 
 @Component({
   selector: 'bat-landing-page',
-  imports: [NgOptimizedImage],
+  imports: [LandingHero, LandingSettings, LandingDoctrine, LandingMission],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,7 +63,6 @@ export class LandingPage {
     { label: 'ACCENT', value: this.settings().accentIntensity.toUpperCase() },
     { label: 'SONAR', value: this.sonarStatus() }
   ]);
-  protected readonly activeTerminalLine = computed(() => this.terminalFeed().at(-1) ?? 'SCANNING FOR CONTACTS...');
   protected readonly audioInstruction = computed(() =>
     this.sonarStatus() === 'BLOCKED'
       ? 'Tap anywhere in the control station to arm sonar playback.'

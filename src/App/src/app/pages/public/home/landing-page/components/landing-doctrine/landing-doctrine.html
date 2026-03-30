@@ -1,0 +1,12 @@
+<article class="tactical-panel doctrine-panel" aria-labelledby="doctrine-title">
+  <div class="panel-heading">
+    <p class="panel-kicker">DEFENSE STRATEGIES</p>
+    <h2 id="doctrine-title">COMMAND DOCTRINE</h2>
+  </div>
+
+  <ul class="rules-list">
+    @for (strategy of strategies(); track strategy) {
+      <li>{{ strategy }}</li>
+    }
+  </ul>
+</article>
