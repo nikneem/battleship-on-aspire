@@ -148,8 +148,7 @@
   justify-self: end;
   align-self: stretch;
   inline-size: min(100%, 24rem);
-  block-size: fit-content;
-  max-block-size: min(50vh, 28rem);
+  block-size: clamp(20rem, 50vh, 28rem);
   position: relative;
   z-index: 1;
 }

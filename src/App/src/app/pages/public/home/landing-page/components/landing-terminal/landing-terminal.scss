@@ -4,9 +4,9 @@
 
 .terminal-panel {
   display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 0.75rem;
-  min-height: 20rem;
-  max-height: min(50vh, 28rem);
+  block-size: clamp(20rem, 50vh, 28rem);
   padding: 0.85rem;
   border: 1px solid var(--battle-ops-electric-cyan);
   background: var(--battle-ops-midnight-blue);
@@ -31,6 +31,7 @@
 
 .terminal-feed {
   display: grid;
+  align-content: start;
   gap: 0.35rem;
   padding: 0.75rem 0.85rem;
   border: 1px solid rgb(0 229 255 / 0.16);
