@@ -189,10 +189,206 @@ bat-root {
   box-shadow: 0 0 0 1px var(--battle-ops-accent-color);
 }
 
+:where(.landing-page-host) .shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--battle-ops-shell-gap);
+}
+
+:where(.landing-page-host) .hero-panel {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
+  align-items: center;
+}
+
+:where(.landing-page-host) .hero-copy,
+:where(.landing-page-host) .hero-visual,
+:where(.landing-page-host) .settings-panel,
+:where(.landing-page-host) .mission-grid,
+:where(.landing-page-host) .gauge-strip {
+  display: grid;
+  gap: 1rem;
+}
+
+:where(.landing-page-host) .eyebrow,
+:where(.landing-page-host) .panel-kicker,
+:where(.landing-page-host) .telemetry-card dt,
+:where(.landing-page-host) .gauge-copy span,
+:where(.landing-page-host) .mission-card span {
+  color: var(--battle-ops-soft-aqua);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+:where(.landing-page-host) h1,
+:where(.landing-page-host) h2,
+:where(.landing-page-host) h3,
+:where(.landing-page-host) .telemetry-card dd,
+:where(.landing-page-host) .gauge-meter strong {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+:where(.landing-page-host) h1 {
+  font-size: clamp(2.7rem, 4.5vw, 4.6rem);
+  line-height: 0.92;
+}
+
+:where(.landing-page-host) h2 {
+  font-size: 1.25rem;
+}
+
+:where(.landing-page-host) h3 {
+  font-size: 0.9rem;
+  color: var(--battle-ops-text-primary);
+}
+
+:where(.landing-page-host) .deck,
+:where(.landing-page-host) .setting-copy p,
+:where(.landing-page-host) .mission-copy,
+:where(.landing-page-host) .mission-card p {
+  color: var(--battle-ops-text-secondary);
+  margin: 0;
+  max-width: 62ch;
+}
+
+:where(.landing-page-host) .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+:where(.landing-page-host) .telemetry-grid,
+:where(.landing-page-host) .content-grid,
+:where(.landing-page-host) .mission-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+:where(.landing-page-host) .telemetry-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+:where(.landing-page-host) .content-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:where(.landing-page-host) .telemetry-card,
+:where(.landing-page-host) .gauge-card,
+:where(.landing-page-host) .mission-card,
+:where(.landing-page-host) .terminal-feed,
+:where(.landing-page-host) .radar-console {
+  border: 1px solid var(--battle-ops-border-color);
+  background: var(--battle-ops-panel-elevated);
+}
+
+:where(.landing-page-host) .telemetry-card {
+  padding: var(--battle-ops-panel-padding);
+}
+
+:where(.landing-page-host) .telemetry-card dd {
+  color: var(--battle-ops-text-primary);
+  font-size: 1rem;
+  margin-top: 0.35rem;
+}
+
+:where(.landing-page-host) .panel-heading {
+  display: grid;
+  gap: 0.35rem;
+}
+
+:where(.landing-page-host) .setting-group {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(102 242 255 / 0.12);
+}
+
+:where(.landing-page-host) .toggle-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--battle-ops-border-color);
+  padding: 0.8rem 1rem;
+  background: rgb(10 26 42 / 0.78);
+}
+
+:where(.landing-page-host) .toggle-row input {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  accent-color: var(--battle-ops-accent-color);
+}
+
+:where(.landing-page-host) .chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+:where(.landing-page-host) .option-chip {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 10rem;
+  border: 1px solid var(--battle-ops-border-color);
+  background: transparent;
+  color: var(--battle-ops-text-primary);
+  padding: 0.85rem 1rem;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+:where(.landing-page-host) .option-chip small {
+  color: var(--battle-ops-text-secondary);
+}
+
+:where(.landing-page-host) .option-chip:hover,
+:where(.landing-page-host) .option-chip:focus-visible,
+:where(.landing-page-host) .option-chip.is-selected {
+  border-color: var(--battle-ops-accent-color);
+  background: rgb(0 229 255 / 0.08);
+  box-shadow: 0 0 18px rgb(0 229 255 / 0.16);
+  transform: translateY(-1px);
+}
+
+:where(.landing-page-host) .rules-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--battle-ops-text-secondary);
+}
+
+:where(.landing-page-host) .rules-list li::marker {
+  color: var(--battle-ops-accent-color);
+}
+
+:where(.landing-page-host) .mission-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:where(.landing-page-host) .mission-card {
+  padding: 1rem;
+}
+
 :root[data-motion='reduced'] *,
 :root[data-motion='reduced'] *::before,
 :root[data-motion='reduced'] *::after {
   animation-duration: 1ms !important;
   animation-iteration-count: 1 !important;
   scroll-behavior: auto !important;
+}
+
+@media (max-width: 1100px) {
+  :where(.landing-page-host) .hero-panel,
+  :where(.landing-page-host) .content-grid,
+  :where(.landing-page-host) .mission-grid,
+  :where(.landing-page-host) .gauge-strip,
+  :where(.landing-page-host) .telemetry-grid {
+    grid-template-columns: 1fr;
+  }
 }
