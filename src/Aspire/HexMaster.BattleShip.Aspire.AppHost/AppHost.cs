@@ -14,6 +14,7 @@ var battleship = builder.AddJavaScriptApp("battleship", @"..\..\App", "start")
 
 battleship.WithArgs(context =>
 {
+    context.Args.Add("--");
     context.Args.Add("--host");
     context.Args.Add("0.0.0.0");
     context.Args.Add("--port");
