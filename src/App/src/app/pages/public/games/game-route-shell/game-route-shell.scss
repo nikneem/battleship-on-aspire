@@ -253,3 +253,41 @@
     min-height: min(85vw, 32rem);
   }
 }
+
+/* ── Combat mode ──────────────────────────────────────────────────────────── */
+
+.gameplay-grid--combat {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.combat-panel {
+  border: 1px solid var(--battle-ops-border-color);
+  background: var(--battle-ops-panel-elevated);
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.state-lock--your-turn {
+  color: var(--battle-ops-accent-color);
+}
+
+.state-lock--victory {
+  color: var(--battle-ops-accent-color);
+  font-weight: 700;
+}
+
+.state-lock--defeat {
+  color: var(--battle-ops-damage-red);
+}
+
+.state-prompt--error {
+  color: var(--battle-ops-damage-red);
+}
+
+@media (max-width: 1100px) {
+  .gameplay-grid--combat {
+    grid-template-columns: 1fr;
+  }
+}
+

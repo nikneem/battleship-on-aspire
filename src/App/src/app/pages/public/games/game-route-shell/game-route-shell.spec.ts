@@ -1,8 +1,50 @@
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { Subject, of } from 'rxjs';
 
 import { GameRouteShell } from './game-route-shell';
+import { GameSignalRService } from '../../../../game-signal-r.service';
+import { GamesApiService, GameStateResponse } from '../../../../games-api.service';
+
+const defaultGameState: GameStateResponse = {
+  gameCode: 'SECTOR7',
+  phase: 2,
+  currentTurnPlayerId: null,
+  winnerPlayerId: null,
+  currentPlayer: { playerId: 'player-1', playerName: 'Commander', state: 2 },
+  opponent: null,
+  ownBoard: { isLocked: false, ships: [], incomingShots: [] },
+  opponentBoard: { knownShots: [] }
+};
+
+const lockedGameState: GameStateResponse = {
+  ...defaultGameState,
+  ownBoard: { isLocked: true, ships: [], incomingShots: [] }
+};
+
+function makeSignalRStub() {
+  return {
+    connect: () => {},
+    disconnect: () => {},
+    shotFired$: new Subject(),
+    gameStarted$: new Subject(),
+    gameFinished$: new Subject(),
+    gameAbandoned$: new Subject(),
+    opponentConnectionLost$: new Subject(),
+    fleetLocked$: new Subject()
+  };
+}
+
+function makeGamesApiStub() {
+  return {
+    getGameState: () => of(defaultGameState),
+    submitFleet: () => of(defaultGameState),
+    lockFleet: () => of(lockedGameState),
+    fireShot: () => of(defaultGameState),
+    createGame: () => { throw new Error('Not expected in these tests'); }
+  };
+}
 
 describe('GameRouteShell', () => {
   beforeEach(() => {
@@ -19,6 +61,8 @@ describe('GameRouteShell', () => {
       imports: [GameRouteShell],
       providers: [
         provideHttpClient(),
+        { provide: GameSignalRService, useValue: makeSignalRStub() },
+        { provide: GamesApiService, useValue: makeGamesApiStub() },
         {
           provide: ActivatedRoute,
           useValue: {

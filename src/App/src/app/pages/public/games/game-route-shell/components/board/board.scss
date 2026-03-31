@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+.combat-board-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  grid-template-rows: 2rem minmax(0, 1fr);
+  gap: 0.55rem;
+}
+
+.combat-board__columns,
+.combat-board__rows {
+  display: grid;
+  color: var(--battle-ops-soft-aqua);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.combat-board__columns {
+  grid-column: 1 / -1;
+  grid-template-columns: 2.25rem repeat(10, minmax(0, 1fr));
+  align-items: center;
+  text-align: center;
+}
+
+.combat-board__rows {
+  grid-row: 2;
+  grid-template-rows: repeat(10, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+}
+
+.combat-board {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.24rem;
+  padding: 0.24rem;
+  min-height: min(42vw, 28rem);
+  border: 1px solid var(--battle-ops-border-color);
+  background:
+    linear-gradient(180deg, rgb(5 12 19 / 0.96), rgb(9 25 39 / 0.96)),
+    var(--battle-ops-panel-base);
+}
+
+.combat-board__cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--battle-ops-border-color);
+  background: rgb(0 229 255 / 0.06);
+  color: var(--battle-ops-text-primary);
+  cursor: default;
+  overflow: hidden;
+}
+
+.combat-board[data-mode='attack'] .combat-board__cell:not([disabled]):hover {
+  border-color: var(--battle-ops-accent-color);
+  background: rgb(0 229 255 / 0.14);
+  box-shadow: 0 0 16px rgb(0 229 255 / 0.18);
+  cursor: crosshair;
+}
+
+.combat-board__cell.is-ship {
+  background: rgb(0 229 255 / 0.16);
+  border-color: rgb(0 229 255 / 0.4);
+}
+
+.combat-board__cell.is-selected {
+  border-color: var(--battle-ops-damage-red);
+  background: rgb(255 40 60 / 0.2);
+  box-shadow: inset 0 0 0 1px var(--battle-ops-damage-red);
+}
+
+.shot-marker {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.shot-marker--miss {
+  color: rgb(0 229 255 / 0.65);
+  font-size: 0.55rem;
+}
+
+.shot-marker--hit {
+  color: var(--battle-ops-damage-red);
+  font-weight: 700;
+}

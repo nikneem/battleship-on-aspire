@@ -1,0 +1,44 @@
+<div class="combat-board-shell">
+  <div class="combat-board__columns" aria-hidden="true">
+    <span class="combat-board__corner"></span>
+    @for (col of boardColumns; track col) {
+      <span>{{ col }}</span>
+    }
+  </div>
+
+  <div class="combat-board__rows" aria-hidden="true">
+    @for (label of rowLabels; track label) {
+      <span>{{ label }}</span>
+    }
+  </div>
+
+  <div
+    class="combat-board"
+    role="grid"
+    [attr.data-mode]="mode()"
+    [attr.aria-label]="mode() === 'attack' ? 'Attack board — select a cell to fire' : 'Defend board — your fleet positions'"
+  >
+    @for (cell of cells(); track cell.key) {
+      <button
+        class="combat-board__cell"
+        type="button"
+        [class.is-ship]="cell.isShip"
+        [class.is-selected]="cell.isSelected"
+        [class.is-miss]="cell.shot !== null && cell.shot.outcome === 0"
+        [class.is-hit]="cell.shot !== null && cell.shot.outcome > 0"
+        [attr.data-cell]="cell.key"
+        [attr.aria-label]="'Cell ' + cell.label + (cell.shot !== null ? (cell.shot.outcome === 0 ? ' — miss' : ' — hit') : '')"
+        [disabled]="mode() === 'defend' || cell.shot !== null"
+        (click)="clickCell(cell.row, cell.column)"
+      >
+        @if (cell.shot !== null) {
+          @if (cell.shot.outcome === 0) {
+            <span class="shot-marker shot-marker--miss" aria-hidden="true">●</span>
+          } @else {
+            <span class="shot-marker shot-marker--hit" aria-hidden="true">✕</span>
+          }
+        }
+      </button>
+    }
+  </div>
+</div>

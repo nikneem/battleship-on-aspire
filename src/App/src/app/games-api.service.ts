@@ -8,6 +8,50 @@ export interface CreateGameResponse {
   readonly gameCode: string;
 }
 
+export interface ShotRecord {
+  readonly coordinate: { readonly row: number; readonly column: number };
+  readonly outcome: number; // 0=Miss, 1=Hit, 2=Sunk
+}
+
+export interface ShipPlacement {
+  readonly length: number;
+  readonly start: { readonly row: number; readonly column: number };
+  readonly orientation: number; // 0=Horizontal, 1=Vertical
+}
+
+export interface PlayerBoardState {
+  readonly isLocked: boolean;
+  readonly ships: readonly ShipPlacement[];
+  readonly incomingShots: readonly ShotRecord[];
+}
+
+export interface OpponentBoardState {
+  readonly knownShots: readonly ShotRecord[];
+}
+
+export interface GameParticipant {
+  readonly playerId: string;
+  readonly playerName: string;
+  readonly state: number;
+}
+
+export interface GameStateResponse {
+  readonly gameCode: string;
+  readonly phase: number; // 0=LobbyOpen, 1=LobbyFull, 2=Setup, 3=InProgress, 4=Finished, 5=Cancelled, 6=Abandoned
+  readonly currentTurnPlayerId: string | null;
+  readonly winnerPlayerId: string | null;
+  readonly currentPlayer: GameParticipant;
+  readonly opponent: GameParticipant | null;
+  readonly ownBoard: PlayerBoardState;
+  readonly opponentBoard: OpponentBoardState;
+}
+
+export interface ShipPlacementRequest {
+  readonly length: number;
+  readonly start: { readonly row: number; readonly column: number };
+  readonly orientation: number; // 0=Horizontal, 1=Vertical
+}
+
 @Injectable({ providedIn: 'root' })
 export class GamesApiService {
   private readonly httpClient = inject(HttpClient);
@@ -31,5 +75,51 @@ export class GamesApiService {
         })
       }
     );
+  }
+
+  getGameState(gameCode: string): Observable<GameStateResponse> {
+    const session = this.requireSession();
+    return this.httpClient.get<GameStateResponse>(`/api/games/${gameCode}`, {
+      headers: this.authHeaders(session.accessToken)
+    });
+  }
+
+  submitFleet(gameCode: string, ships: readonly ShipPlacementRequest[]): Observable<GameStateResponse> {
+    const session = this.requireSession();
+    return this.httpClient.put<GameStateResponse>(
+      `/api/games/${gameCode}/fleet`,
+      { ships },
+      { headers: this.authHeaders(session.accessToken) }
+    );
+  }
+
+  lockFleet(gameCode: string): Observable<GameStateResponse> {
+    const session = this.requireSession();
+    return this.httpClient.post<GameStateResponse>(
+      `/api/games/${gameCode}/lock`,
+      {},
+      { headers: this.authHeaders(session.accessToken) }
+    );
+  }
+
+  fireShot(gameCode: string, row: number, column: number): Observable<GameStateResponse> {
+    const session = this.requireSession();
+    return this.httpClient.post<GameStateResponse>(
+      `/api/games/${gameCode}/shots`,
+      { target: { row, column } },
+      { headers: this.authHeaders(session.accessToken) }
+    );
+  }
+
+  private requireSession() {
+    const session = this.identityService.session();
+    if (session === null) {
+      throw new Error('An anonymous player session must exist before calling this API.');
+    }
+    return session;
+  }
+
+  private authHeaders(token: string): HttpHeaders {
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 }

@@ -1,8 +1,45 @@
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { Subject, of } from 'rxjs';
 import { App } from './app';
 import { routes } from './app.routes';
+import { GameSignalRService } from './game-signal-r.service';
+import { GamesApiService, GameStateResponse } from './games-api.service';
+
+const defaultGameState: GameStateResponse = {
+  gameCode: 'SECTOR7',
+  phase: 2,
+  currentTurnPlayerId: null,
+  winnerPlayerId: null,
+  currentPlayer: { playerId: 'player-1', playerName: 'Commander', state: 2 },
+  opponent: null,
+  ownBoard: { isLocked: false, ships: [], incomingShots: [] },
+  opponentBoard: { knownShots: [] }
+};
+
+function makeSignalRStub() {
+  return {
+    connect: () => {},
+    disconnect: () => {},
+    shotFired$: new Subject(),
+    gameStarted$: new Subject(),
+    gameFinished$: new Subject(),
+    gameAbandoned$: new Subject(),
+    opponentConnectionLost$: new Subject(),
+    fleetLocked$: new Subject()
+  };
+}
+
+function makeGamesApiStub() {
+  return {
+    getGameState: () => of(defaultGameState),
+    submitFleet: () => of(defaultGameState),
+    lockFleet: () => of(defaultGameState),
+    fireShot: () => of(defaultGameState),
+    createGame: (joinSecret: string) => of({ gameCode: 'SECTOR7' })
+  };
+}
 
 describe('App', () => {
   const originalAudio = window.Audio;
@@ -25,13 +62,19 @@ describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes), provideHttpClient()]
+      providers: [
+        provideRouter(routes),
+        provideHttpClient(),
+        { provide: GameSignalRService, useValue: makeSignalRStub() },
+        { provide: GamesApiService, useValue: makeGamesApiStub() }
+      ]
     }).compileComponents();
   });
 
   afterEach(() => {
     window.Audio = originalAudio;
   });
+
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(App);
