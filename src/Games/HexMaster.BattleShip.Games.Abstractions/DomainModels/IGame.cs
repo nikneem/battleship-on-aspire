@@ -48,7 +48,7 @@ public interface IGame
 
     void SubmitFleet(string playerId, IReadOnlyCollection<GameShipPlacement> ships);
 
-    void LockFleet(string playerId);
+    void LockFleet(string playerId, bool hostGoesFirst);
 
     ShotOutcome FireShot(string playerId, GameCoordinate target);
 

@@ -122,7 +122,7 @@ public sealed class Game : IGame
         HasChanges = true;
     }
 
-    public void LockFleet(string playerId)
+    public void LockFleet(string playerId, bool hostGoesFirst)
     {
         EnsurePhase(GamePhase.Setup);
 
@@ -132,7 +132,7 @@ public sealed class Game : IGame
         if (host.Board.IsLocked && guest?.Board.IsLocked == true)
         {
             Phase = GamePhase.InProgress;
-            CurrentTurnPlayerId = host.PlayerId;
+            CurrentTurnPlayerId = hostGoesFirst ? host.PlayerId : guest!.PlayerId;
         }
 
         HasChanges = true;

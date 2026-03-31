@@ -12,7 +12,8 @@ public sealed record LockFleetCommand(string GameCode, string PlayerId)
 
 public sealed class LockFleetHandler(
     IGameRepository gameRepository,
-    IEventBus eventBus) : ICommandHandler<LockFleetCommand, GameStateResponseDto>
+    IEventBus eventBus,
+    IRandomProvider randomProvider) : ICommandHandler<LockFleetCommand, GameStateResponseDto>
 {
     public async Task<GameStateResponseDto> HandleAsync(
         LockFleetCommand command,
@@ -21,7 +22,8 @@ public sealed class LockFleetHandler(
         var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
                    ?? throw new KeyNotFoundException("The requested game could not be found.");
 
-        game.LockFleet(command.PlayerId);
+        var hostGoesFirst = randomProvider.NextBool();
+        game.LockFleet(command.PlayerId, hostGoesFirst);
 
         await gameRepository.SaveAsync(game, cancellationToken);
         await eventBus.PublishAsync(

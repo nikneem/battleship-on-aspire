@@ -20,3 +20,8 @@ public interface IGameCodeGenerator
 {
     string GenerateCode();
 }
+
+public interface IRandomProvider
+{
+    bool NextBool();
+}

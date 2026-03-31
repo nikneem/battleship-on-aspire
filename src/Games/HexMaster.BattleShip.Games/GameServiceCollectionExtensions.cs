@@ -12,6 +12,7 @@ public static class GameServiceCollectionExtensions
         services.AddSingleton<IGameRepository, InMemoryGameRepository>();
         services.AddSingleton<IGameSecretHasher, Pbkdf2GameSecretHasher>();
         services.AddSingleton<IGameCodeGenerator, RandomGameCodeGenerator>();
+        services.AddSingleton<IRandomProvider, SystemRandomProvider>();
         services.AddHandlersFromAssembly(Assembly.GetExecutingAssembly());
 
         return services;
