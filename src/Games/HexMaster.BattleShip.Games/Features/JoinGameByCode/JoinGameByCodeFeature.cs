@@ -1,7 +1,9 @@
 using HexMaster.BattleShip.Core.Cqrs;
+using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
 using HexMaster.BattleShip.Games.Abstractions.Services;
 using HexMaster.BattleShip.Games.DomainModels;
+using HexMaster.BattleShip.IntegrationEvents;
 
 namespace HexMaster.BattleShip.Games.Features.JoinGameByCode;
 
@@ -13,7 +15,8 @@ public sealed record JoinGameByCodeCommand(
 
 public sealed class JoinGameByCodeHandler(
     IGameRepository gameRepository,
-    IGameSecretHasher secretHasher) : ICommandHandler<JoinGameByCodeCommand, GameLobbyResponseDto>
+    IGameSecretHasher secretHasher,
+    IEventBus eventBus) : ICommandHandler<JoinGameByCodeCommand, GameLobbyResponseDto>
 {
     public async Task<GameLobbyResponseDto> HandleAsync(
         JoinGameByCodeCommand command,
@@ -27,6 +30,10 @@ public sealed class JoinGameByCodeHandler(
         game.JoinGuest(command.PlayerId, command.PlayerName, secretValidated);
 
         await gameRepository.SaveAsync(game, cancellationToken);
+        await eventBus.PublishAsync(
+            new PlayerJoinedGameIntegrationEvent(game.GameCode, command.PlayerId, command.PlayerName),
+            cancellationToken);
+
         return GameMappings.ToLobbyResponseDto(game);
     }
 }

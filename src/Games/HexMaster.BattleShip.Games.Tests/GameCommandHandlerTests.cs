@@ -1,3 +1,4 @@
+using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
 using HexMaster.BattleShip.Games.Abstractions.Models;
 using HexMaster.BattleShip.Games.Abstractions.Services;
@@ -22,7 +23,8 @@ public sealed class GameCommandHandlerTests
         var createHandler = new CreateGameHandler(
             repository,
             new StubGameCodeGenerator("12345678"),
-            secretHasher);
+            secretHasher,
+            new NullEventBus());
 
         var response = await createHandler.HandleAsync(new CreateGameCommand("host-1", "Admiral", "let-me-in"));
         var storedGame = await repository.GetByCodeAsync(response.GameCode);
@@ -43,8 +45,9 @@ public sealed class GameCommandHandlerTests
         var createHandler = new CreateGameHandler(
             repository,
             new StubGameCodeGenerator("12345678"),
-            secretHasher);
-        var joinHandler = new JoinGameByCodeHandler(repository, secretHasher);
+            secretHasher,
+            new NullEventBus());
+        var joinHandler = new JoinGameByCodeHandler(repository, secretHasher, new NullEventBus());
 
         await createHandler.HandleAsync(new CreateGameCommand("host-1", "Admiral", "let-me-in"));
 
@@ -65,7 +68,7 @@ public sealed class GameCommandHandlerTests
     {
         var repository = new InMemoryGameRepository();
         await CreateReadyToPlayGameAsync(repository);
-        var fireShotHandler = new FireShotHandler(repository);
+        var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
 
         var hostView = await fireShotHandler.HandleAsync(
             new FireShotCommand("12345678", "host-1", new GameCoordinate(9, 9)));
@@ -84,7 +87,7 @@ public sealed class GameCommandHandlerTests
     {
         var repository = new InMemoryGameRepository();
         await CreateReadyToPlayGameAsync(repository);
-        var fireShotHandler = new FireShotHandler(repository);
+        var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
 
         await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "host-1", new GameCoordinate(9, 9)));
         await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "guest-1", new GameCoordinate(9, 8)));
@@ -98,7 +101,7 @@ public sealed class GameCommandHandlerTests
     {
         var repository = new InMemoryGameRepository();
         await CreateJoinedLobbyAsync(repository);
-        var abandonHandler = new AbandonGameHandler(repository);
+        var abandonHandler = new AbandonGameHandler(repository, new NullEventBus());
 
         var response = await abandonHandler.HandleAsync(new AbandonGameCommand("12345678", "guest-1"));
 
@@ -112,7 +115,7 @@ public sealed class GameCommandHandlerTests
     {
         var repository = new InMemoryGameRepository();
         await CreateReadyToPlayGameAsync(repository);
-        var fireShotHandler = new FireShotHandler(repository);
+        var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
         var queryHandler = new GetGameStateForPlayerHandler(repository);
 
         await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "host-1", new GameCoordinate(9, 9)));
@@ -128,11 +131,13 @@ public sealed class GameCommandHandlerTests
     private static async Task CreateJoinedLobbyAsync(InMemoryGameRepository repository)
     {
         var secretHasher = new Pbkdf2GameSecretHasher();
+        var nullBus = new NullEventBus();
         var createHandler = new CreateGameHandler(
             repository,
             new StubGameCodeGenerator("12345678"),
-            secretHasher);
-        var joinHandler = new JoinGameByCodeHandler(repository, secretHasher);
+            secretHasher,
+            nullBus);
+        var joinHandler = new JoinGameByCodeHandler(repository, secretHasher, nullBus);
 
         await createHandler.HandleAsync(new CreateGameCommand("host-1", "Admiral", null));
         await joinHandler.HandleAsync(new JoinGameByCodeCommand("12345678", "guest-1", "Commander", null));
@@ -142,9 +147,10 @@ public sealed class GameCommandHandlerTests
     {
         await CreateJoinedLobbyAsync(repository);
 
-        var markReadyHandler = new MarkReadyHandler(repository);
-        var submitFleetHandler = new SubmitFleetHandler(repository);
-        var lockFleetHandler = new LockFleetHandler(repository);
+        var nullBus = new NullEventBus();
+        var markReadyHandler = new MarkReadyHandler(repository, nullBus);
+        var submitFleetHandler = new SubmitFleetHandler(repository, nullBus);
+        var lockFleetHandler = new LockFleetHandler(repository, nullBus);
 
         await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "host-1"));
         await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "guest-1"));
@@ -181,5 +187,12 @@ public sealed class GameCommandHandlerTests
     private sealed class StubGameCodeGenerator(string gameCode) : IGameCodeGenerator
     {
         public string GenerateCode() => gameCode;
+    }
+
+    private sealed class NullEventBus : IEventBus
+    {
+        public Task PublishAsync<TEvent>(TEvent integrationEvent, CancellationToken cancellationToken = default)
+            where TEvent : IntegrationEvents.IntegrationEvent
+            => Task.CompletedTask;
     }
 }

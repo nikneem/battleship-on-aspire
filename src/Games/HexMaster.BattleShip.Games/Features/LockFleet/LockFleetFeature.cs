@@ -1,14 +1,18 @@
 using HexMaster.BattleShip.Core.Cqrs;
+using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
+using HexMaster.BattleShip.Games.Abstractions.Models;
 using HexMaster.BattleShip.Games.Abstractions.Services;
+using HexMaster.BattleShip.IntegrationEvents;
 
 namespace HexMaster.BattleShip.Games.Features.LockFleet;
 
 public sealed record LockFleetCommand(string GameCode, string PlayerId)
     : ICommand<GameStateResponseDto>;
 
-public sealed class LockFleetHandler(IGameRepository gameRepository)
-    : ICommandHandler<LockFleetCommand, GameStateResponseDto>
+public sealed class LockFleetHandler(
+    IGameRepository gameRepository,
+    IEventBus eventBus) : ICommandHandler<LockFleetCommand, GameStateResponseDto>
 {
     public async Task<GameStateResponseDto> HandleAsync(
         LockFleetCommand command,
@@ -20,6 +24,17 @@ public sealed class LockFleetHandler(IGameRepository gameRepository)
         game.LockFleet(command.PlayerId);
 
         await gameRepository.SaveAsync(game, cancellationToken);
+        await eventBus.PublishAsync(
+            new FleetLockedIntegrationEvent(game.GameCode, command.PlayerId),
+            cancellationToken);
+
+        if (game.Phase == GamePhase.InProgress)
+        {
+            await eventBus.PublishAsync(
+                new GameStartedIntegrationEvent(game.GameCode, game.CurrentTurnPlayerId!),
+                cancellationToken);
+        }
+
         return GameMappings.ToStateResponseDto(game, command.PlayerId);
     }
 }

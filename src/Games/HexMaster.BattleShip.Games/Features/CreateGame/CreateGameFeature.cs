@@ -1,7 +1,9 @@
 using HexMaster.BattleShip.Core.Cqrs;
+using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
 using HexMaster.BattleShip.Games.Abstractions.Services;
 using HexMaster.BattleShip.Games.DomainModels;
+using HexMaster.BattleShip.IntegrationEvents;
 
 namespace HexMaster.BattleShip.Games.Features.CreateGame;
 
@@ -11,7 +13,8 @@ public sealed record CreateGameCommand(string HostPlayerId, string HostPlayerNam
 public sealed class CreateGameHandler(
     IGameRepository gameRepository,
     IGameCodeGenerator gameCodeGenerator,
-    IGameSecretHasher secretHasher) : ICommandHandler<CreateGameCommand, CreateGameResponseDto>
+    IGameSecretHasher secretHasher,
+    IEventBus eventBus) : ICommandHandler<CreateGameCommand, CreateGameResponseDto>
 {
     public async Task<CreateGameResponseDto> HandleAsync(
         CreateGameCommand command,
@@ -41,6 +44,10 @@ public sealed class CreateGameHandler(
         }
 
         await gameRepository.SaveAsync(game, cancellationToken);
+        await eventBus.PublishAsync(
+            new GameCreatedIntegrationEvent(game.GameCode, game.Host.PlayerId, game.Host.PlayerName),
+            cancellationToken);
+
         return GameMappings.ToCreateGameResponseDto(game);
     }
 }

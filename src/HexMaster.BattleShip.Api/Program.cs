@@ -1,10 +1,15 @@
 using System.Text;
+using HexMaster.BattleShip.Api.Infrastructure;
+using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games;
 using HexMaster.BattleShip.Games.Endpoints;
 using HexMaster.BattleShip.Profiles.Endpoints;
 using HexMaster.BattleShip.Profiles;
 using HexMaster.BattleShip.Profiles.Abstractions.Claims;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
+using HexMaster.BattleShip.Realtime;
+using HexMaster.BattleShip.Realtime.Endpoints;
+using HexMaster.BattleShip.Realtime.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,6 +20,8 @@ builder.AddServiceDefaults();
 builder.Services.AddOpenApi();
 builder.Services.AddGamesModule();
 builder.Services.AddProfilesModule(builder.Configuration);
+builder.Services.AddRealtimeModule();
+builder.Services.AddSingleton<IEventBus, DaprEventBus>();
 
 var anonymousPlayerSessionOptions = builder.Configuration
     .GetRequiredSection(AnonymousPlayerSessionOptions.SectionName)
@@ -52,11 +59,16 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCloudEvents();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapSubscribeHandler();
+app.MapHub<GameHub>("/hubs/game");
 app.MapGamesEndpoints();
+app.MapGamesSubscriptions();
 app.MapProfilesEndpoints();
+app.MapRealtimeSubscriptions();
 
 app.Run();

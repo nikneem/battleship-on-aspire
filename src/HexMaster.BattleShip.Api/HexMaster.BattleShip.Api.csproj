@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
   </ItemGroup>
@@ -17,6 +18,7 @@
     <ProjectReference Include="..\Games\HexMaster.BattleShip.Games\HexMaster.BattleShip.Games.csproj" />
     <ProjectReference Include="..\Profiles\HexMaster.BattleShip.Profiles\HexMaster.BattleShip.Profiles.csproj" />
     <ProjectReference Include="..\Profiles\HexMaster.BattleShip.Profiles.Abstractions\HexMaster.BattleShip.Profiles.Abstractions.csproj" />
+    <ProjectReference Include="..\Realtime\HexMaster.BattleShip.Realtime\HexMaster.BattleShip.Realtime.csproj" />
   </ItemGroup>
 
 </Project>

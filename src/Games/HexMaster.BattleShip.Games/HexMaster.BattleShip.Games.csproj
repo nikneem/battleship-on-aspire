@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\..\HexMaster.BattleShip.Core\HexMaster.BattleShip.Core.csproj" />
     <ProjectReference Include="..\HexMaster.BattleShip.Games.Abstractions\HexMaster.BattleShip.Games.Abstractions.csproj" />

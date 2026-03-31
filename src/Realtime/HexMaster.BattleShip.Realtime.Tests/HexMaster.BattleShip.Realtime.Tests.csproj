@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HexMaster.BattleShip.Realtime\HexMaster.BattleShip.Realtime.csproj" />
+  </ItemGroup>
+
 </Project>

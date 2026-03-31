@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\HexMaster.BattleShip.Core\HexMaster.BattleShip.Core.csproj" />
+    <ProjectReference Include="..\HexMaster.BattleShip.Realtime.Abstractions\HexMaster.BattleShip.Realtime.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
