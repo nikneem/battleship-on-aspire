@@ -20,6 +20,7 @@ import {
 } from '../../../../games-api.service';
 import { GameSignalRService } from '../../../../game-signal-r.service';
 import { BoardComponent, SelectedCell } from './components/board/board';
+import { GameOutcomeOverlayComponent } from '../../../../components/game-outcome-overlay/game-outcome-overlay';
 
 type ShipOrientation = 'horizontal' | 'vertical';
 
@@ -67,7 +68,7 @@ const shipDefinitions: readonly ShipDefinition[] = [
 
 @Component({
   selector: 'bat-game-route-shell',
-  imports: [RouterLink, BoardComponent],
+  imports: [RouterLink, BoardComponent, GameOutcomeOverlayComponent],
   templateUrl: './game-route-shell.html',
   styleUrl: './game-route-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -155,6 +156,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
   protected readonly isMyTurn = computed(() => this.activeMode() === 'attack');
   protected readonly isGameOver = computed(() => this.gamePhase() >= 4);
   protected readonly isWinner = computed(() => this.winnerPlayerId() === this.myPlayerId());
+  protected readonly outcome = computed<'winner' | 'loser'>(() => this.isWinner() ? 'winner' : 'loser');
   protected readonly showFireButton = computed(
     () => this.inCombatMode() && !this.isGameOver() && this.selectedAttackCell() !== null && this.isMyTurn()
   );
@@ -254,6 +256,11 @@ export class GameRouteShell implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.signalR.disconnect();
     this.subs.unsubscribe();
+  }
+
+  // ── Outcome actions ────────────────────────────────────────────────────────
+  protected backToMain(): void {
+    this.router.navigate(['/']);
   }
 
   // ── Setup actions ──────────────────────────────────────────────────────────

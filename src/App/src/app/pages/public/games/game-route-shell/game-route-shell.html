@@ -1,4 +1,4 @@
-<main class="gameplay-shell" aria-labelledby="game-route-title">
+<main class="gameplay-shell" [class.gameplay-shell--game-over]="isGameOver()" aria-labelledby="game-route-title">
   <a class="command-link command-link--secondary" routerLink="/">RETURN TO COMMAND DECK</a>
 
   <section class="gameplay-header tactical-panel" aria-labelledby="game-route-title">
@@ -212,4 +212,11 @@
     </section>
   }
 </main>
+
+@if (isGameOver()) {
+  <bat-game-outcome-overlay
+    [outcome]="outcome()"
+    (backToMain)="backToMain()"
+  />
+}
 

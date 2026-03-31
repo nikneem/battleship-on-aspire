@@ -1,0 +1,29 @@
+<div class="overlay-backdrop" role="dialog" aria-modal="true" [attr.aria-label]="outcome() === 'winner' ? 'Victory' : 'Defeat'">
+  <div class="overlay-panel">
+    <div class="outcome-icon" [class.winner]="outcome() === 'winner'" [class.loser]="outcome() === 'loser'">
+      @if (outcome() === 'winner') {
+        <span class="outcome-symbol">⬡</span>
+      } @else {
+        <span class="outcome-symbol">✕</span>
+      }
+    </div>
+
+    <h1 class="outcome-heading">
+      @if (outcome() === 'winner') {
+        WINNER!
+      } @else {
+        YOU LOST
+      }
+    </h1>
+
+    <p class="outcome-subtext">
+      @if (outcome() === 'winner') {
+        All enemy vessels have been neutralised. Mission accomplished.
+      } @else {
+        All friendly vessels have been destroyed. Stand down, commander.
+      }
+    </p>
+
+    <button class="back-btn" (click)="onBackToMain()">BACK TO MAIN</button>
+  </div>
+</div>

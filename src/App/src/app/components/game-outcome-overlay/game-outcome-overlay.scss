@@ -1,0 +1,87 @@
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(5 7 10 / 0.88);
+  backdrop-filter: blur(6px);
+}
+
+.overlay-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 4rem;
+  background: var(--battle-ops-panel-elevated);
+  border: 1px solid var(--battle-ops-border-color);
+  box-shadow: 0 0 48px var(--battle-ops-glow-color);
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+}
+
+.outcome-icon {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border: 2px solid;
+
+  &.winner {
+    border-color: var(--battle-ops-electric-cyan);
+    color: var(--battle-ops-electric-cyan);
+    box-shadow: 0 0 24px var(--battle-ops-glow-color);
+  }
+
+  &.loser {
+    border-color: var(--battle-ops-damage-red);
+    color: var(--battle-ops-damage-red);
+    box-shadow: 0 0 24px rgb(179 58 58 / 0.35);
+  }
+}
+
+.outcome-symbol {
+  line-height: 1;
+}
+
+.outcome-heading {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--battle-ops-text-primary);
+}
+
+.outcome-subtext {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--battle-ops-text-secondary);
+  letter-spacing: 0.04em;
+  max-width: 320px;
+}
+
+.back-btn {
+  margin-top: 0.5rem;
+  padding: 0.75rem 2.5rem;
+  background: transparent;
+  border: 1px solid var(--battle-ops-electric-cyan);
+  color: var(--battle-ops-electric-cyan);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition:
+    background var(--battle-ops-transition-duration) ease,
+    box-shadow var(--battle-ops-transition-duration) ease;
+
+  &:hover {
+    background: var(--battle-ops-accent-glow);
+    box-shadow: 0 0 12px var(--battle-ops-glow-color);
+  }
+}

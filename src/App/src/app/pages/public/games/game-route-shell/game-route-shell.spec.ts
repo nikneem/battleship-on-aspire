@@ -171,6 +171,43 @@ describe('GameRouteShell', () => {
 
     expect(carrier?.style.gridColumn).toBe(originalGridColumn);
   });
+  it('should show outcome overlay with winner when gameFinished$ fires with own player ID', () => {
+    const signalRStub = makeSignalRStub();
+    TestBed.overrideProvider(GameSignalRService, { useValue: signalRStub });
+
+    const fixture = TestBed.createComponent(GameRouteShell);
+    fixture.detectChanges();
+
+    signalRStub.gameStarted$.next('player-1');
+    fixture.detectChanges();
+
+    signalRStub.gameFinished$.next('player-1');
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const overlay = host.querySelector('bat-game-outcome-overlay');
+    expect(overlay).not.toBeNull();
+    expect(host.textContent).toContain('WINNER!');
+  });
+
+  it('should show outcome overlay with loser when gameFinished$ fires with opponent player ID', () => {
+    const signalRStub = makeSignalRStub();
+    TestBed.overrideProvider(GameSignalRService, { useValue: signalRStub });
+
+    const fixture = TestBed.createComponent(GameRouteShell);
+    fixture.detectChanges();
+
+    signalRStub.gameStarted$.next('player-2');
+    fixture.detectChanges();
+
+    signalRStub.gameFinished$.next('player-2');
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const overlay = host.querySelector('bat-game-outcome-overlay');
+    expect(overlay).not.toBeNull();
+    expect(host.textContent).toContain('YOU LOST');
+  });
 });
 
 function placeShip(host: HTMLElement, fixture: { detectChanges(): void }, shipId: string, cellKey: string): void {

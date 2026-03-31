@@ -18,6 +18,11 @@
   margin-inline: auto;
 }
 
+.gameplay-shell--game-over {
+  pointer-events: none;
+  user-select: none;
+}
+
 .gameplay-header {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
