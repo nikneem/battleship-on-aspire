@@ -1,11 +1,11 @@
 ## 1. IntegrationEvents Library
 
-- [ ] 1.1 Create project `src/IntegrationEvents/HexMaster.BattleShip.IntegrationEvents` and add to `Battleship.slnx`
-- [ ] 1.2 Implement abstract `IntegrationEvent` base record with `EventId`, `OccurredOn`, and abstract `SchemaVersion`
-- [ ] 1.3 Implement all Games domain integration event records (`GameCreatedIntegrationEvent`, `PlayerJoinedGameIntegrationEvent`, `PlayerMarkedReadyIntegrationEvent`, `FleetSubmittedIntegrationEvent`, `FleetLockedIntegrationEvent`, `GameStartedIntegrationEvent`, `ShotFiredIntegrationEvent`, `GameFinishedIntegrationEvent`, `GameCancelledIntegrationEvent`, `GameAbandonedIntegrationEvent`)
-- [ ] 1.4 Implement all Realtime connection lifecycle event records (`PlayerConnectionLostIntegrationEvent`, `PlayerConnectionReestablishedIntegrationEvent`, `PlayerConnectionTimedOutIntegrationEvent`)
-- [ ] 1.5 Implement static `IntegrationEventTopics` class with one string constant per event type following `battleship.{domain}.{verb-past-tense}` naming
-- [ ] 1.6 Verify the project has zero references to other solution projects and no external NuGet dependencies
+- [x] 1.1 Create project `src/IntegrationEvents/HexMaster.BattleShip.IntegrationEvents` and add to `Battleship.slnx`
+- [x] 1.2 Implement abstract `IntegrationEvent` base record with `EventId`, `OccurredOn`, and abstract `SchemaVersion`
+- [x] 1.3 Implement all Games domain integration event records (`GameCreatedIntegrationEvent`, `PlayerJoinedGameIntegrationEvent`, `PlayerMarkedReadyIntegrationEvent`, `FleetSubmittedIntegrationEvent`, `FleetLockedIntegrationEvent`, `GameStartedIntegrationEvent`, `ShotFiredIntegrationEvent`, `GameFinishedIntegrationEvent`, `GameCancelledIntegrationEvent`, `GameAbandonedIntegrationEvent`)
+- [x] 1.4 Implement all Realtime connection lifecycle event records (`PlayerConnectionLostIntegrationEvent`, `PlayerConnectionReestablishedIntegrationEvent`, `PlayerConnectionTimedOutIntegrationEvent`)
+- [x] 1.5 Implement static `IntegrationEventTopics` class with one string constant per event type following `battleship.{domain}.{verb-past-tense}` naming
+- [x] 1.6 Verify the project has zero references to other solution projects and no external NuGet dependencies
 
 ## 2. IEventBus Abstraction
 

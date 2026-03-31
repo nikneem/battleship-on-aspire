@@ -18,6 +18,9 @@
     <Project Path="Realtime/HexMaster.BattleShip.Realtime.Tests/HexMaster.BattleShip.Realtime.Tests.csproj" Id="31f931d0-81e7-4981-837c-173519a3a275" />
     <Project Path="Realtime/HexMaster.BattleShip.Realtime/HexMaster.BattleShip.Realtime.csproj" Id="e8323c69-ad7b-49ec-9c47-11981efba16b" />
   </Folder>
+  <Folder Name="/IntegrationEvents/">
+    <Project Path="IntegrationEvents/HexMaster.BattleShip.IntegrationEvents/HexMaster.BattleShip.IntegrationEvents.csproj" />
+  </Folder>
   <Folder Name="/Shared/">
     <Project Path="HexMaster.BattleShip.Core.Tests/HexMaster.BattleShip.Core.Tests.csproj" Id="09c78334-601c-4de2-9717-0fa45b6507a1" />
     <Project Path="HexMaster.BattleShip.Core/HexMaster.BattleShip.Core.csproj" Id="82341f45-0d1b-4f51-a519-c94ac95cbada" />
