@@ -10,6 +10,7 @@ using HexMaster.BattleShip.Games.Features.JoinGameByCode;
 using HexMaster.BattleShip.Games.Features.LockFleet;
 using HexMaster.BattleShip.Games.Features.MarkReady;
 using HexMaster.BattleShip.Games.Features.SubmitFleet;
+using HexMaster.BattleShip.IntegrationEvents;
 
 namespace HexMaster.BattleShip.Games.Tests;
 
@@ -67,7 +68,7 @@ public sealed class GameCommandHandlerTests
     public async Task FireShotAlternatesTurnsAfterEveryShot()
     {
         var repository = new InMemoryGameRepository();
-        await CreateReadyToPlayGameAsync(repository);
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: true);
         var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
 
         var hostView = await fireShotHandler.HandleAsync(
@@ -86,7 +87,7 @@ public sealed class GameCommandHandlerTests
     public async Task FireShotRejectsDuplicateCoordinateForOpponentBoard()
     {
         var repository = new InMemoryGameRepository();
-        await CreateReadyToPlayGameAsync(repository);
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: true);
         var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
 
         await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "host-1", new GameCoordinate(9, 9)));
@@ -114,7 +115,7 @@ public sealed class GameCommandHandlerTests
     public async Task GetGameStateForPlayerReturnsOwnBoardAndOnlyKnownOpponentShots()
     {
         var repository = new InMemoryGameRepository();
-        await CreateReadyToPlayGameAsync(repository);
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: true);
         var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
         var queryHandler = new GetGameStateForPlayerHandler(repository);
 
@@ -126,6 +127,106 @@ public sealed class GameCommandHandlerTests
         Assert.Single(state.OpponentBoard.KnownShots);
         Assert.Equal(new GameCoordinateDto(9, 9), state.OpponentBoard.KnownShots[0].Coordinate);
         Assert.Equal(PlayerGameStateProjection.OpponentTurn, state.CurrentPlayer.State);
+    }
+
+    [Fact]
+    public async Task LockFleetSetsHostAsFirstTurnWhenRandomProviderReturnsTrue()
+    {
+        var repository = new InMemoryGameRepository();
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: true);
+
+        var game = await repository.GetByCodeAsync("12345678");
+
+        Assert.NotNull(game);
+        Assert.Equal(GamePhase.InProgress, game.Phase);
+        Assert.Equal("host-1", game.CurrentTurnPlayerId);
+    }
+
+    [Fact]
+    public async Task LockFleetSetsGuestAsFirstTurnWhenRandomProviderReturnsFalse()
+    {
+        var repository = new InMemoryGameRepository();
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: false);
+
+        var game = await repository.GetByCodeAsync("12345678");
+
+        Assert.NotNull(game);
+        Assert.Equal(GamePhase.InProgress, game.Phase);
+        Assert.Equal("guest-1", game.CurrentTurnPlayerId);
+    }
+
+    [Fact]
+    public async Task LockFleetFirstLockDoesNotTransitionToInProgress()
+    {
+        var repository = new InMemoryGameRepository();
+        await CreateJoinedLobbyAsync(repository);
+        var nullBus = new NullEventBus();
+        var markReadyHandler = new MarkReadyHandler(repository, nullBus);
+        var submitFleetHandler = new SubmitFleetHandler(repository, nullBus);
+        var lockFleetHandler = new LockFleetHandler(repository, nullBus, new FixedRandomProvider(true));
+
+        await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "host-1"));
+        await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "guest-1"));
+        await submitFleetHandler.HandleAsync(new SubmitFleetCommand("12345678", "host-1", CreateHostFleet()));
+        await submitFleetHandler.HandleAsync(new SubmitFleetCommand("12345678", "guest-1", CreateGuestFleet()));
+        await lockFleetHandler.HandleAsync(new LockFleetCommand("12345678", "host-1"));
+
+        var game = await repository.GetByCodeAsync("12345678");
+
+        Assert.NotNull(game);
+        Assert.Equal(GamePhase.Setup, game.Phase);
+        Assert.Null(game.CurrentTurnPlayerId);
+    }
+
+    [Fact]
+    public async Task LockFleetPublishesGameStartedEventOnlyWhenBothFleetsAreLocked()
+    {
+        var repository = new InMemoryGameRepository();
+        await CreateJoinedLobbyAsync(repository);
+        var capturedBus = new CapturingEventBus();
+        var markReadyHandler = new MarkReadyHandler(repository, capturedBus);
+        var submitFleetHandler = new SubmitFleetHandler(repository, capturedBus);
+        var lockFleetHandler = new LockFleetHandler(repository, capturedBus, new FixedRandomProvider(true));
+
+        await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "host-1"));
+        await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "guest-1"));
+        await submitFleetHandler.HandleAsync(new SubmitFleetCommand("12345678", "host-1", CreateHostFleet()));
+        await submitFleetHandler.HandleAsync(new SubmitFleetCommand("12345678", "guest-1", CreateGuestFleet()));
+
+        capturedBus.PublishedEvents.Clear();
+
+        await lockFleetHandler.HandleAsync(new LockFleetCommand("12345678", "host-1"));
+        Assert.DoesNotContain(capturedBus.PublishedEvents, e => e is GameStartedIntegrationEvent);
+
+        await lockFleetHandler.HandleAsync(new LockFleetCommand("12345678", "guest-1"));
+        Assert.Contains(capturedBus.PublishedEvents, e => e is GameStartedIntegrationEvent started && started.FirstTurnPlayerId == "host-1");
+    }
+
+    [Fact]
+    public async Task LockFleetFirstTurnSelectionIsIndependentOfLockOrder()
+    {
+        var repositoryHostFirst = new InMemoryGameRepository();
+        var repositoryGuestFirst = new InMemoryGameRepository();
+
+        await SetupBothLobbyStates(repositoryHostFirst);
+        await SetupBothLobbyStates(repositoryGuestFirst);
+
+        var nullBus = new NullEventBus();
+        var hostFirstLockHandler = new LockFleetHandler(repositoryHostFirst, nullBus, new FixedRandomProvider(false));
+        var guestFirstLockHandler = new LockFleetHandler(repositoryGuestFirst, nullBus, new FixedRandomProvider(false));
+
+        // Host locks first in repo 1; guest locks first in repo 2 — both use FixedRandomProvider(false) → guest always wins
+        await hostFirstLockHandler.HandleAsync(new LockFleetCommand("12345678", "host-1"));
+        await hostFirstLockHandler.HandleAsync(new LockFleetCommand("12345678", "guest-1"));
+
+        await guestFirstLockHandler.HandleAsync(new LockFleetCommand("12345678", "guest-1"));
+        await guestFirstLockHandler.HandleAsync(new LockFleetCommand("12345678", "host-1"));
+
+        var game1 = await repositoryHostFirst.GetByCodeAsync("12345678");
+        var game2 = await repositoryGuestFirst.GetByCodeAsync("12345678");
+
+        Assert.Equal("guest-1", game1!.CurrentTurnPlayerId);
+        Assert.Equal("guest-1", game2!.CurrentTurnPlayerId);
     }
 
     private static async Task CreateJoinedLobbyAsync(InMemoryGameRepository repository)
@@ -143,14 +244,26 @@ public sealed class GameCommandHandlerTests
         await joinHandler.HandleAsync(new JoinGameByCodeCommand("12345678", "guest-1", "Commander", null));
     }
 
-    private static async Task CreateReadyToPlayGameAsync(InMemoryGameRepository repository)
+    private static async Task SetupBothLobbyStates(InMemoryGameRepository repository)
+    {
+        await CreateJoinedLobbyAsync(repository);
+        var nullBus = new NullEventBus();
+        var markReadyHandler = new MarkReadyHandler(repository, nullBus);
+        var submitFleetHandler = new SubmitFleetHandler(repository, nullBus);
+        await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "host-1"));
+        await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "guest-1"));
+        await submitFleetHandler.HandleAsync(new SubmitFleetCommand("12345678", "host-1", CreateHostFleet()));
+        await submitFleetHandler.HandleAsync(new SubmitFleetCommand("12345678", "guest-1", CreateGuestFleet()));
+    }
+
+    private static async Task CreateReadyToPlayGameAsync(InMemoryGameRepository repository, bool hostGoesFirst)
     {
         await CreateJoinedLobbyAsync(repository);
 
         var nullBus = new NullEventBus();
         var markReadyHandler = new MarkReadyHandler(repository, nullBus);
         var submitFleetHandler = new SubmitFleetHandler(repository, nullBus);
-        var lockFleetHandler = new LockFleetHandler(repository, nullBus);
+        var lockFleetHandler = new LockFleetHandler(repository, nullBus, new FixedRandomProvider(hostGoesFirst));
 
         await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "host-1"));
         await markReadyHandler.HandleAsync(new MarkReadyCommand("12345678", "guest-1"));
@@ -189,10 +302,28 @@ public sealed class GameCommandHandlerTests
         public string GenerateCode() => gameCode;
     }
 
+    private sealed class FixedRandomProvider(bool value) : IRandomProvider
+    {
+        public bool NextBool() => value;
+    }
+
     private sealed class NullEventBus : IEventBus
     {
         public Task PublishAsync<TEvent>(TEvent integrationEvent, CancellationToken cancellationToken = default)
-            where TEvent : IntegrationEvents.IntegrationEvent
+            where TEvent : IntegrationEvent
             => Task.CompletedTask;
     }
+
+    private sealed class CapturingEventBus : IEventBus
+    {
+        public List<object> PublishedEvents { get; } = [];
+
+        public Task PublishAsync<TEvent>(TEvent integrationEvent, CancellationToken cancellationToken = default)
+            where TEvent : IntegrationEvent
+        {
+            PublishedEvents.Add(integrationEvent!);
+            return Task.CompletedTask;
+        }
+    }
 }
+
