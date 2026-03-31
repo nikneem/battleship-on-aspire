@@ -1,1 +1,7 @@
 <router-outlet />
+
+<bat-landing-sound-settings
+  [settings]="soundSettings()"
+  (effectsVolumeChange)="setEffectsVolume($event)"
+  (musicVolumeChange)="setMusicVolume($event)"
+/>

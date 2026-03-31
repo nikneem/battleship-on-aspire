@@ -1,3 +1,4 @@
+import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { App } from './app';
@@ -24,7 +25,7 @@ describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes)]
+      providers: [provideRouter(routes), provideHttpClient()]
     }).compileComponents();
   });
 
@@ -151,6 +152,59 @@ describe('App', () => {
     fixture.detectChanges();
 
     expect(host.textContent).toContain('> HELLO CAPTAIN');
+  });
+
+  it('should render the gameplay route shell for a game code', async () => {
+    localStorage.setItem('battle-ops-access-token', 'gameplay-token');
+    localStorage.setItem('battle-ops-access-token-expires-at', '2026-03-30T12:00:00Z');
+    localStorage.setItem('battle-ops-player-id', 'player-7');
+    localStorage.setItem('battle-ops-player-name', 'Navigator');
+
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/games/SECTOR7');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('GAME SECTOR7');
+    expect(compiled.textContent).toContain('NAVIGATOR');
+    expect(compiled.textContent).toContain('AWAITING OPPONENT');
+    expect(compiled.querySelectorAll('.setup-board__cell').length).toBe(100);
+  });
+
+  it('should show the sound settings cog on the create-game page', async () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/create-game');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const soundToggle = compiled.querySelector('.sound-settings-toggle') as HTMLButtonElement | null;
+
+    expect(soundToggle).not.toBeNull();
+    expect(soundToggle?.getAttribute('aria-label')).toBe('Open sound settings');
+  });
+
+  it('should show the sound settings cog on the gameplay page', async () => {
+    localStorage.setItem('battle-ops-access-token', 'gameplay-token');
+    localStorage.setItem('battle-ops-access-token-expires-at', '2026-03-30T12:00:00Z');
+    localStorage.setItem('battle-ops-player-id', 'player-8');
+    localStorage.setItem('battle-ops-player-name', 'Helm');
+
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/games/ABCD1234');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const soundToggle = compiled.querySelector('.sound-settings-toggle') as HTMLButtonElement | null;
+
+    expect(soundToggle).not.toBeNull();
+    expect(soundToggle?.getAttribute('aria-label')).toBe('Open sound settings');
   });
 });
 

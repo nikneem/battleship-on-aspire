@@ -1,9 +1,156 @@
-<main class="game-shell tactical-panel" aria-labelledby="game-route-title">
-  <p class="eyebrow">ACTIVE LOBBY // TRANSIT STAGE</p>
-  <h1 id="game-route-title">GAME {{ gameCode }}</h1>
-  <p class="deck">
-    The host handoff is complete. Full gameplay-page implementation will layer on top of this route in the next UI
-    change.
-  </p>
+<main class="gameplay-shell" aria-labelledby="game-route-title">
   <a class="command-link command-link--secondary" routerLink="/">RETURN TO COMMAND DECK</a>
+
+  <section class="gameplay-header tactical-panel" aria-labelledby="game-route-title">
+    <article class="header-card header-card--player" aria-labelledby="current-player-title">
+      <p class="eyebrow">CURRENT PLAYER // PORT WATCH</p>
+      <h1 id="game-route-title">GAME {{ gameCode }}</h1>
+      <h2 id="current-player-title">{{ currentPlayerName() }}</h2>
+      <p class="deck">Commander identity is sourced from the local anonymous session profile.</p>
+    </article>
+
+    <article class="header-card header-card--state" aria-labelledby="game-state-title">
+      <p class="eyebrow">GAME STATE // COMBAT PREP</p>
+      <h2 id="game-state-title">{{ stateHeading() }}</h2>
+      <p class="deck">{{ stateDetail() }}</p>
+
+      @if (readyActionVisible()) {
+        <button
+          class="command-link command-link--attention"
+          type="button"
+          data-ready-action
+          (click)="confirmReady()"
+        >
+          READY
+        </button>
+      } @else if (fleetLocked()) {
+        <p class="state-lock">READY SIGNAL CONFIRMED // FLEET HOLDING POSITION</p>
+      } @else {
+        <p class="state-prompt">PLACE ALL FIVE SHIPS TO ARM THE READY ACTION.</p>
+      }
+    </article>
+
+    <article class="header-card header-card--opponent" aria-labelledby="opponent-title">
+      <p class="eyebrow">OPPONENT // STARBOARD WATCH</p>
+      <h2 id="opponent-title">{{ opponentName() }}</h2>
+      <p class="deck">The opposing commander slot remains visible even before a second player joins the board.</p>
+    </article>
+  </section>
+
+  <section class="gameplay-grid">
+    <article class="setup-panel tactical-panel" aria-labelledby="setup-board-title">
+      <div class="panel-heading">
+        <p class="eyebrow">SETUP BOARD // DEPLOYMENT GRID</p>
+        <h2 id="setup-board-title">PLACE YOUR FLEET</h2>
+        <p class="deck">{{ boardInstruction() }}</p>
+      </div>
+
+      <div class="setup-board-shell">
+        <div class="setup-board__columns" aria-hidden="true">
+          <span class="setup-board__corner"></span>
+          @for (column of boardColumns; track column) {
+            <span>{{ column }}</span>
+          }
+        </div>
+
+        <div class="setup-board__rows">
+          @for (rowLabel of ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']; track rowLabel; let rowIndex = $index) {
+            <span>{{ rowLabel }}</span>
+          }
+        </div>
+
+        <div class="setup-board" role="grid" aria-label="Battleship setup board">
+          @for (cell of boardCells(); track cell.key) {
+            <button
+              class="setup-board__cell"
+              type="button"
+              [class.is-occupied]="cell.occupiedBy !== null"
+              [class.is-selected]="cell.occupiedBy === selectedShipId()"
+              [attr.data-cell]="cell.key"
+              [attr.aria-label]="'Cell ' + cell.label"
+              (click)="deploySelectedShip(cell.row, cell.column)"
+              (dragover)="allowBoardDrop($event)"
+              (drop)="handleBoardDrop($event, cell.row, cell.column)"
+            >
+              <span>{{ cell.label }}</span>
+            </button>
+          }
+
+          <div class="setup-board__placements">
+            @for (ship of placedShips(); track ship.id) {
+              <button
+                class="setup-board__ship"
+                type="button"
+                [class.is-selected]="ship.id === selectedShipId()"
+                [style.gridColumn]="ship.gridColumn"
+                [style.gridRow]="ship.gridRow"
+                [attr.data-ship-id]="ship.id"
+                [attr.data-orientation]="ship.orientation"
+                [attr.aria-label]="ship.label + ' occupying ' + ship.occupiedCellsLabel"
+                [draggable]="!fleetLocked()"
+                (click)="selectPlacedShip(ship.id, $event)"
+                (dragstart)="handleShipDragStart($event, ship.id)"
+                (dragend)="handleShipDragEnd()"
+              >
+                <span>{{ ship.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <aside class="inventory-panel tactical-panel" aria-labelledby="inventory-title">
+      <div class="panel-heading">
+        <p class="eyebrow">SHIP INVENTORY // BELOW BOARD</p>
+        <h2 id="inventory-title">AVAILABLE HULLS</h2>
+        <p class="deck">
+          The fleet uses a 10x10 setup grid with the standard five-ship Battleship inventory.
+        </p>
+      </div>
+
+      <ul class="ship-inventory" role="list">
+        @for (ship of inventoryShips(); track ship.id) {
+          <li>
+            <button
+              class="ship-card"
+              type="button"
+              [class.is-selected]="ship.id === selectedShipId()"
+              [class.is-placed]="ship.isPlaced"
+              [attr.data-ship-id]="ship.id"
+              [draggable]="!fleetLocked()"
+              (click)="selectShip(ship.id)"
+              (dragstart)="handleShipDragStart($event, ship.id)"
+              (dragend)="handleShipDragEnd()"
+            >
+              <span class="ship-card__header">
+                <span class="ship-card__name">{{ ship.label }}</span>
+                <span class="ship-card__length">{{ ship.length }} CELLS</span>
+              </span>
+              <span class="ship-card__status">{{ ship.statusLabel }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+
+      @if (selectedPlacedShip(); as ship) {
+        <section class="context-panel" aria-labelledby="selected-ship-title">
+          <p class="eyebrow">SELECTED SHIP // CONTEXT CONTROLS</p>
+          <h3 id="selected-ship-title">{{ ship.label }}</h3>
+          <p class="deck">Orientation: {{ ship.orientation }} // Cells: {{ ship.occupiedCellsLabel }}</p>
+
+          @if (!fleetLocked()) {
+            <button class="command-link context-panel__action" type="button" data-rotate-action (click)="rotateSelectedShip()">
+              ROTATE
+            </button>
+          }
+        </section>
+      } @else {
+        <section class="context-panel context-panel--idle" aria-live="polite">
+          <p class="eyebrow">SELECTED SHIP // CONTEXT CONTROLS</p>
+          <p class="deck">Select a placed ship on the board to reveal contextual rotation controls.</p>
+        </section>
+      }
+    </aside>
+  </section>
 </main>

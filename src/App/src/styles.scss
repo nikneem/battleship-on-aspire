@@ -383,3 +383,72 @@ bat-root {
     inline-size: 100%;
   }
 }
+
+:where(.game-route-shell-host) .command-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--battle-ops-border-color);
+  background: rgb(0 229 255 / 0.06);
+  color: var(--battle-ops-text-primary);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  box-shadow: 0 0 18px rgb(0 229 255 / 0.1);
+  cursor: pointer;
+}
+
+:where(.game-route-shell-host) .command-link--secondary {
+  justify-self: start;
+  background: transparent;
+}
+
+:where(.game-route-shell-host) .command-link--attention {
+  animation: ready-pulse 1.8s ease-in-out infinite;
+}
+
+:where(.game-route-shell-host) .eyebrow {
+  margin: 0;
+  color: var(--battle-ops-soft-aqua);
+  font-size: 0.76rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+:where(.game-route-shell-host) h1,
+:where(.game-route-shell-host) h2,
+:where(.game-route-shell-host) h3,
+:where(.game-route-shell-host) .deck {
+  margin: 0;
+}
+
+:where(.game-route-shell-host) h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+:where(.game-route-shell-host) h2 {
+  font-size: 1.15rem;
+  text-transform: uppercase;
+}
+
+:where(.game-route-shell-host) h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+:where(.game-route-shell-host) .deck {
+  max-width: 60ch;
+}
+
+@keyframes ready-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 18px rgb(255 179 0 / 0.12);
+  }
+
+  50% {
+    box-shadow: 0 0 26px rgb(255 179 0 / 0.32);
+  }
+}

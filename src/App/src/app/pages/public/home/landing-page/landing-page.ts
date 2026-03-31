@@ -5,13 +5,12 @@ import { LandingDoctrine } from './components/landing-doctrine/landing-doctrine'
 import { LandingHero } from './components/landing-hero/landing-hero';
 import { LandingMission } from './components/landing-mission/landing-mission';
 import { LandingRadar } from './components/landing-radar/landing-radar';
-import { LandingSoundSettings } from './components/landing-sound-settings/landing-sound-settings';
 import { type GaugeReadout, type RadarContact } from './landing-page.models';
 import { terminalMessages } from './terminal-messages';
 
 @Component({
   selector: 'bat-landing-page',
-  imports: [LandingHero, LandingDoctrine, LandingMission, LandingSoundSettings, LandingRadar],
+  imports: [LandingHero, LandingDoctrine, LandingMission, LandingRadar],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -107,14 +106,6 @@ export class LandingPage {
         this.audio.removeEventListener('ended', this.handleSonarEnd);
       }
     });
-  }
-
-  protected setEffectsVolume(value: number): void {
-    this.soundSettingsService.setEffectsVolume(value);
-  }
-
-  protected setMusicVolume(value: number): void {
-    this.soundSettingsService.setMusicVolume(value);
   }
 
   private seedTerminalFeed(): void {

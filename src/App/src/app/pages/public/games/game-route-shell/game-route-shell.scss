@@ -2,9 +2,254 @@
   display: block;
 }
 
-.game-shell {
+.gameplay-shell,
+.gameplay-header,
+.gameplay-grid,
+.setup-panel,
+.inventory-panel,
+.panel-heading,
+.context-panel {
   display: grid;
   gap: 1rem;
-  max-width: 36rem;
+}
+
+.gameplay-shell {
+  max-width: 88rem;
   margin-inline: auto;
+}
+
+.gameplay-header {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.header-card,
+.setup-panel,
+.inventory-panel,
+.context-panel {
+  border: 1px solid var(--battle-ops-border-color);
+  background: var(--battle-ops-panel-elevated);
+}
+
+.header-card,
+.context-panel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.header-card {
+  height: 100%;
+  align-content: start;
+}
+
+.header-card--state {
+  justify-items: start;
+}
+
+.gameplay-grid {
+  grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 0.85fr);
+  align-items: start;
+}
+
+.setup-board-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  grid-template-rows: 2rem minmax(0, 1fr);
+  gap: 0.55rem;
+}
+
+.setup-board__columns,
+.setup-board__rows {
+  display: grid;
+  color: var(--battle-ops-soft-aqua);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.setup-board__columns {
+  grid-column: 1 / -1;
+  grid-template-columns: 2.25rem repeat(10, minmax(0, 1fr));
+  align-items: center;
+  text-align: center;
+}
+
+.setup-board__rows {
+  grid-row: 2;
+  grid-template-rows: repeat(10, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+}
+
+.setup-board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.24rem;
+  padding: 0.24rem;
+  min-height: min(70vw, 38rem);
+  border: 1px solid var(--battle-ops-border-color);
+  background:
+    linear-gradient(180deg, rgb(5 12 19 / 0.96), rgb(9 25 39 / 0.96)),
+    var(--battle-ops-panel-base);
+}
+
+.setup-board__cell,
+.setup-board__ship,
+.command-link,
+.ship-card {
+  border: 1px solid var(--battle-ops-border-color);
+  background: rgb(0 229 255 / 0.06);
+  color: var(--battle-ops-text-primary);
+}
+
+.setup-board__cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.setup-board__cell span {
+  font-size: 0.58rem;
+  opacity: 0.48;
+}
+
+.setup-board__cell.is-occupied {
+  background: rgb(0 229 255 / 0.12);
+}
+
+.setup-board__cell.is-selected {
+  border-color: var(--battle-ops-accent-color);
+  box-shadow: inset 0 0 0 1px var(--battle-ops-accent-color);
+}
+
+.setup-board__cell:hover,
+.setup-board__cell:focus-visible,
+.setup-board__ship:hover,
+.setup-board__ship:focus-visible,
+.ship-card:hover,
+.ship-card:focus-visible,
+.command-link:hover,
+.command-link:focus-visible {
+  border-color: var(--battle-ops-accent-color);
+  background: rgb(0 229 255 / 0.14);
+  box-shadow: 0 0 22px rgb(0 229 255 / 0.18);
+  transform: translateY(-1px);
+}
+
+.setup-board__placements {
+  position: absolute;
+  inset: 0.24rem;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-rows: repeat(10, minmax(0, 1fr));
+  gap: 0.24rem;
+  pointer-events: none;
+}
+
+.setup-board__ship {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background:
+    linear-gradient(180deg, rgb(0 229 255 / 0.2), rgb(0 229 255 / 0.08)),
+    rgb(5 12 19 / 0.92);
+  pointer-events: auto;
+}
+
+.setup-board__ship span {
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.setup-board__ship[data-orientation='vertical'] span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.setup-board__ship.is-selected {
+  border-color: var(--battle-ops-amber);
+  box-shadow: 0 0 0 1px var(--battle-ops-amber), 0 0 22px rgb(255 179 0 / 0.16);
+}
+
+.ship-inventory {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ship-card,
+.command-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  box-shadow: 0 0 18px rgb(0 229 255 / 0.1);
+  cursor: pointer;
+}
+
+.ship-card {
+  width: 100%;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.ship-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ship-card__name,
+.ship-card__length {
+  font-size: 0.8rem;
+}
+
+.ship-card__status,
+.deck,
+.state-lock,
+.state-prompt {
+  color: var(--battle-ops-text-secondary);
+}
+
+.ship-card.is-selected,
+.command-link--attention {
+  border-color: var(--battle-ops-amber);
+  box-shadow: 0 0 20px rgb(255 179 0 / 0.16);
+}
+
+.ship-card.is-placed {
+  background: rgb(0 229 255 / 0.1);
+}
+
+@media (max-width: 1100px) {
+  .gameplay-header,
+  .gameplay-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .setup-board {
+    min-height: min(85vw, 32rem);
+  }
 }

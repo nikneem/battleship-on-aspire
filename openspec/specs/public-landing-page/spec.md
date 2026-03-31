@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Define the public landing page experience at the application root, including its tactical presentation, rotating terminal activity feed, opportunistic ambient sonar audio, and educational mission content.
+
+## Requirements
 
 ### Requirement: Default route displays the public landing page
 The system SHALL map the default route (`/`) to a public landing page component located in the frontend project so visitors arrive on a purpose-built entry experience instead of the generated starter content.
