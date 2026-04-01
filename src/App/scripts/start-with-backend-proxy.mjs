@@ -17,6 +17,13 @@ writeFileSync(
         changeOrigin: true,
         secure: false,
         logLevel: 'warn'
+      },
+      '/hubs': {
+        target: configuredApiUrl,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        logLevel: 'warn'
       }
     },
     null,
