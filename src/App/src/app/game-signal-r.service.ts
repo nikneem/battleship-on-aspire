@@ -19,6 +19,7 @@ export class GameSignalRService implements OnDestroy {
   readonly gameAbandoned$ = new Subject<string>();       // abandoningPlayerId
   readonly opponentConnectionLost$ = new Subject<string>(); // playerId
   readonly fleetLocked$ = new Subject<string>();         // playerId
+  readonly playerJoined$ = new Subject<string>();        // guestPlayerId
 
   connect(gameCode: string, playerId: string, token: string): void {
     this.disconnect();
@@ -45,6 +46,9 @@ export class GameSignalRService implements OnDestroy {
     );
     this.connection.on('FleetLocked', (pid: string) =>
       this.fleetLocked$.next(pid)
+    );
+    this.connection.on('PlayerJoined', (guestPlayerId: string) =>
+      this.playerJoined$.next(guestPlayerId)
     );
 
     this.connection

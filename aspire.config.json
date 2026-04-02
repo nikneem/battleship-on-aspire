@@ -1,5 +1,6 @@
 {
   "appHost": {
-    "language": "csharp"
+    "language": "csharp",
+    "path": "src/Aspire/HexMaster.BattleShip.Aspire.AppHost/HexMaster.BattleShip.Aspire.AppHost.csproj"
   }
 }

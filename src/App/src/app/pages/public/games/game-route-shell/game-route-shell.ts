@@ -251,6 +251,10 @@ export class GameRouteShell implements OnInit, OnDestroy {
         // Opponent locked their fleet; no UI change needed beyond what backend signals
       })
     );
+
+    this.subs.add(
+      this.signalR.playerJoined$.subscribe(() => this.loadGameState())
+    );
   }
 
   ngOnDestroy(): void {

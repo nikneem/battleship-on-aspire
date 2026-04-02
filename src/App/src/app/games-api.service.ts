@@ -8,6 +8,15 @@ export interface CreateGameResponse {
   readonly gameCode: string;
 }
 
+export interface GameLobbyResponse {
+  readonly gameCode: string;
+  readonly phase: number; // 0=LobbyOpen, 1=LobbyFull
+  readonly protection: number; // 0=Open, 1=Protected
+  readonly isJoinable: boolean;
+  readonly host: GameParticipant;
+  readonly guest: GameParticipant | null;
+}
+
 export interface ShotRecord {
   readonly coordinate: { readonly row: number; readonly column: number };
   readonly outcome: number; // 0=Miss, 1=Hit, 2=Sunk
@@ -74,6 +83,18 @@ export class GamesApiService {
           Authorization: `Bearer ${session.accessToken}`
         })
       }
+    );
+  }
+
+  joinGame(gameCode: string, joinSecret?: string): Observable<GameLobbyResponse> {
+    const session = this.requireSession();
+    return this.httpClient.post<GameLobbyResponse>(
+      '/api/games/join',
+      {
+        gameCode: gameCode.trim(),
+        joinSecret: joinSecret?.trim() || null
+      },
+      { headers: this.authHeaders(session.accessToken) }
     );
   }
 

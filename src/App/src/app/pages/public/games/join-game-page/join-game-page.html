@@ -1,0 +1,48 @@
+<main class="join-shell tactical-panel" aria-labelledby="join-game-title">
+  <a class="command-link command-link--secondary" routerLink="/">RETURN TO COMMAND DECK</a>
+
+  <header class="join-header">
+    <p class="eyebrow">LOBBY ACCESS // GUEST OPERATOR</p>
+    <h1 id="join-game-title">JOIN GAME</h1>
+    <p class="deck">
+      Establish your player identity, enter the game code you received from the host, and breach the lobby.
+    </p>
+  </header>
+
+  <form class="join-form" [formGroup]="form" (ngSubmit)="joinGame()">
+    <label class="field" for="player-name">
+      <span>PLAYER NAME</span>
+      <input id="player-name" type="text" formControlName="playerName" maxlength="40" autocomplete="nickname" />
+    </label>
+
+    <label class="field" for="game-code">
+      <span>GAME CODE</span>
+      <input id="game-code" type="text" formControlName="gameCode" autocomplete="off" />
+    </label>
+
+    <label class="field" for="join-secret">
+      <span>LOBBY PASSWORD // OPTIONAL</span>
+      <input id="join-secret" type="password" formControlName="joinSecret" autocomplete="current-password" />
+    </label>
+
+    <section class="status-panel" aria-live="polite">
+      @if (profileStatus() === 'pending') {
+        <p>ESTABLISHING PLAYER PROFILE...</p>
+      } @else if (profileStatus() === 'ready') {
+        <p>PLAYER PROFILE READY // JOIN GAME ARMED</p>
+      } @else if (profileStatus() === 'error') {
+        <p>{{ profileError() }}</p>
+      } @else {
+        <p>ENTER A PLAYER NAME TO ARM THE JOIN-GAME SEQUENCE.</p>
+      }
+
+      @if (joinError() !== null) {
+        <p>{{ joinError() }}</p>
+      }
+    </section>
+
+    <button class="command-link" type="submit" [disabled]="!canJoinGame()">
+      JOIN GAME
+    </button>
+  </form>
+</main>
