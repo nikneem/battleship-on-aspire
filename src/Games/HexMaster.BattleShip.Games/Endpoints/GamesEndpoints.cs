@@ -112,7 +112,6 @@ public static class GamesEndpoints
                 "/{gameCode}/ready",
                 async (
                     string gameCode,
-                    MarkReadyRequestDto _,
                     ClaimsPrincipal user,
                     ICommandHandler<MarkReadyCommand, GameStateResponseDto> commandHandler,
                     CancellationToken cancellationToken) =>

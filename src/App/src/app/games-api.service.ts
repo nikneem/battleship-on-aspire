@@ -84,6 +84,10 @@ export class GamesApiService {
     return this.httpClient.put<GameStateResponse>(`/api/games/${gameCode}/fleet`, { ships });
   }
 
+  markReady(gameCode: string): Observable<GameStateResponse> {
+    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/ready`, {});
+  }
+
   lockFleet(gameCode: string): Observable<GameStateResponse> {
     return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/lock`, {});
   }

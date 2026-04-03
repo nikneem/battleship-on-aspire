@@ -40,6 +40,8 @@
             </button>
           }
         }
+      } @else if (waitingForOpponentReady()) {
+        <p class="state-lock">READY SIGNAL SENT // AWAITING OPPOSING COMMANDER</p>
       } @else if (readyActionVisible()) {
         <button
           class="command-link command-link--attention"

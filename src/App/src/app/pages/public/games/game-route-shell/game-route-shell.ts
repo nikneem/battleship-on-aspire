@@ -130,10 +130,10 @@ export class GameRouteShell implements OnInit, OnDestroy {
     return this.placedShips().find((ship) => ship.id === selectedShipId) ?? null;
   });
 
-  // ── Shared / loading ───────────────────────────────────────────────────────
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly submittingFleet = signal(false);
+  protected readonly waitingForOpponentReady = signal(false);
 
   // ── Combat mode state ──────────────────────────────────────────────────────
   protected readonly gamePhase = signal(0);
@@ -167,7 +167,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
     this.isMyTurn() ? 'YOUR TURN // FIRE AT WILL' : "OPPONENT'S TURN // STANDBY"
   );
   protected readonly readyActionVisible = computed(
-    () => this.allShipsPlaced() && !this.fleetLocked() && !this.inCombatMode()
+    () => this.allShipsPlaced() && !this.fleetLocked() && !this.inCombatMode() && !this.waitingForOpponentReady()
   );
   protected readonly stateHeading = computed(() => {
     if (this.inCombatMode()) return 'COMBAT ACTIVE';
@@ -255,6 +255,24 @@ export class GameRouteShell implements OnInit, OnDestroy {
     this.subs.add(
       this.signalR.playerJoined$.subscribe(() => this.loadGameState())
     );
+
+    this.subs.add(
+      this.signalR.playerReady$.subscribe(() => {
+        if (this.waitingForOpponentReady()) {
+          this.subs.add(
+            this.gamesApi.getGameState(this.gameCode).subscribe({
+              next: (state) => {
+                this.applyGameState(state);
+                if (state.phase === 2) {
+                  this.submittingFleet.set(true);
+                  this.submitAndLockFleet();
+                }
+              }
+            })
+          );
+        }
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -332,13 +350,42 @@ export class GameRouteShell implements OnInit, OnDestroy {
   protected confirmReady(): void {
     if (!this.allShipsPlaced() || this.fleetLocked() || this.submittingFleet()) return;
 
+    this.submittingFleet.set(true);
+
+    // If game is already in Setup phase (e.g. after page reload), skip markReady
+    if (this.gamePhase() === 2) {
+      this.submitAndLockFleet();
+      return;
+    }
+
+    this.subs.add(
+      this.gamesApi.markReady(this.gameCode).subscribe({
+        next: (state) => {
+          this.applyGameState(state);
+          if (state.phase === 2) {
+            // Both players are ready — proceed immediately
+            this.submitAndLockFleet();
+          } else {
+            // Waiting for opponent to mark ready
+            this.submittingFleet.set(false);
+            this.waitingForOpponentReady.set(true);
+          }
+        },
+        error: (err) => {
+          console.error('Failed to mark ready:', err);
+          this.submittingFleet.set(false);
+        }
+      })
+    );
+  }
+
+  private submitAndLockFleet(): void {
     const ships: readonly ShipPlacementRequest[] = shipDefinitions.flatMap((def) => {
       const p = this.placements()[def.id];
       if (!p) return [];
       return [{ length: def.length, start: { row: p.row, column: p.column }, orientation: p.orientation === 'horizontal' ? 0 : 1 }];
     });
 
-    this.submittingFleet.set(true);
     this.subs.add(
       this.gamesApi
         .submitFleet(this.gameCode, ships)
@@ -350,6 +397,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
             this.selectedShipId.set(null);
             this.draggingShipId.set(null);
             this.submittingFleet.set(false);
+            this.waitingForOpponentReady.set(false);
           },
           error: (err) => {
             console.error('Failed to submit/lock fleet:', err);
