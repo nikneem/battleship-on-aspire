@@ -231,6 +231,31 @@ describe('App', () => {
     expect(soundToggle?.getAttribute('aria-label')).toBe('Open sound settings');
   });
 
+  it('should restore previously stored sound volumes from localStorage', async () => {
+    localStorage.setItem('battle-ops-effects-volume', '75');
+    localStorage.setItem('battle-ops-music-volume', '65');
+
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const soundToggle = host.querySelector('.sound-settings-toggle') as HTMLButtonElement | null;
+    soundToggle?.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const effectsSlider = host.querySelector('#effects-volume') as HTMLInputElement | null;
+    const musicSlider = host.querySelector('#music-volume') as HTMLInputElement | null;
+
+    expect(effectsSlider?.value).toBe('75');
+    expect(musicSlider?.value).toBe('65');
+    expect(host.textContent).toContain('75%');
+    expect(host.textContent).toContain('65%');
+  });
+
   it('should show the sound settings cog on the gameplay page', async () => {
     localStorage.setItem('battle-ops-access-token', 'gameplay-token');
     localStorage.setItem('battle-ops-access-token-expires-at', '2026-03-30T12:00:00Z');
