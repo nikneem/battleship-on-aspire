@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
 using HexMaster.BattleShip.Games.Abstractions.Services;
@@ -14,9 +15,24 @@ public sealed class GetGameLobbyByCodeHandler(IGameRepository gameRepository)
         GetGameLobbyByCodeQuery query,
         CancellationToken cancellationToken = default)
     {
-        var game = await gameRepository.GetByCodeAsync(query.GameCode, cancellationToken)
-                   ?? throw new KeyNotFoundException("The requested game could not be found.");
+        using var activity = GamesTelemetry.Source.StartActivity("GetGameLobbyByCode");
+        activity?.SetTag("game.code", query.GameCode);
 
-        return GameMappings.ToLobbyResponseDto(game);
+        try
+        {
+            var game = await gameRepository.GetByCodeAsync(query.GameCode, cancellationToken)
+                       ?? throw new KeyNotFoundException("The requested game could not be found.");
+
+            var result = GameMappings.ToLobbyResponseDto(game);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }

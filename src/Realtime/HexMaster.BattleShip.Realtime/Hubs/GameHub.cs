@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.IntegrationEvents;
 using HexMaster.BattleShip.Realtime.Abstractions.Connections;
@@ -16,6 +17,10 @@ public sealed class GameHub(
 
     public async Task JoinGame(string gameCode, string playerId)
     {
+        using var activity = RealtimeTelemetry.Source.StartActivity("JoinGame");
+        activity?.SetTag("game.code", gameCode);
+        activity?.SetTag("game.player_id", playerId);
+
         var timerId = TimerId(gameCode, playerId);
         if (timerService.Cancel(timerId))
         {
@@ -25,6 +30,9 @@ public sealed class GameHub(
 
         connectionTracker.TrackConnection(Context.ConnectionId, gameCode, playerId);
         await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
+
+        activity?.SetStatus(ActivityStatusCode.Ok);
+        RealtimeTelemetry.PlayerConnectionsJoined.Add(1);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -33,6 +41,10 @@ public sealed class GameHub(
         {
             if (exception != null)
             {
+                using var activity = RealtimeTelemetry.Source.StartActivity("PlayerDisconnected");
+                activity?.SetTag("game.code", info.GameCode);
+                activity?.SetTag("game.player_id", info.PlayerId);
+
                 await eventBus.PublishAsync(
                     new PlayerConnectionLostIntegrationEvent(info.GameCode, info.PlayerId, DateTimeOffset.UtcNow));
 
@@ -44,6 +56,9 @@ public sealed class GameHub(
                     TimeSpan.FromSeconds(60),
                     ct => eventBus.PublishAsync(
                         new PlayerConnectionTimedOutIntegrationEvent(info.GameCode, info.PlayerId), ct));
+
+                RealtimeTelemetry.PlayerConnectionsLost.Add(1);
+                activity?.SetStatus(ActivityStatusCode.Ok);
             }
             else
             {

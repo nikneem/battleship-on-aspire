@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
@@ -17,18 +18,35 @@ public sealed class CancelGameHandler(
         CancelGameCommand command,
         CancellationToken cancellationToken = default)
     {
-        await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
+        using var activity = GamesTelemetry.Source.StartActivity("CancelGame");
+        activity?.SetTag("game.code", command.GameCode);
+        activity?.SetTag("game.player_id", command.PlayerId);
 
-        var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
-                   ?? throw new KeyNotFoundException("The requested game could not be found.");
+        try
+        {
+            await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
 
-        game.Cancel(command.PlayerId);
+            var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
+                       ?? throw new KeyNotFoundException("The requested game could not be found.");
 
-        await gameRepository.SaveAsync(game, cancellationToken);
-        await eventBus.PublishAsync(
-            new GameCancelledIntegrationEvent(game.GameCode, command.PlayerId),
-            cancellationToken);
+            game.Cancel(command.PlayerId);
 
-        return GameMappings.ToStateResponseDto(game, command.PlayerId);
+            await gameRepository.SaveAsync(game, cancellationToken);
+            await eventBus.PublishAsync(
+                new GameCancelledIntegrationEvent(game.GameCode, command.PlayerId),
+                cancellationToken);
+
+            var result = GameMappings.ToStateResponseDto(game, command.PlayerId);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            GamesTelemetry.GamesCancelled.Add(1);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }

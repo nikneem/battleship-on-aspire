@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
 using HexMaster.BattleShip.Profiles.Abstractions.DataTransferObjects;
@@ -18,20 +19,38 @@ public sealed class RenewAnonymousPlayerSessionHandler(
         RenewAnonymousPlayerSessionCommand command,
         CancellationToken cancellationToken = default)
     {
-        var tokenPayload = tokenReader.Read(command.AccessToken);
-        var session = await sessionRepository.GetByIdAsync(tokenPayload.PlayerId, cancellationToken);
+        using var activity = ProfilesTelemetry.Source.StartActivity("RenewAnonymousPlayerSession");
 
-        if (session is null)
+        try
         {
-            throw new AnonymousPlayerSessionRenewalException(
-                "The anonymous player session has expired and must be recreated.",
-                AnonymousPlayerSessionRenewalFailureReason.SessionNotFound);
+            var tokenPayload = tokenReader.Read(command.AccessToken);
+            activity?.SetTag("player.id", tokenPayload.PlayerId);
+            activity?.SetTag("player.name", tokenPayload.PlayerName);
+
+            var session = await sessionRepository.GetByIdAsync(tokenPayload.PlayerId, cancellationToken);
+
+            if (session is null)
+            {
+                throw new AnonymousPlayerSessionRenewalException(
+                    "The anonymous player session has expired and must be recreated.",
+                    AnonymousPlayerSessionRenewalFailureReason.SessionNotFound);
+            }
+
+            var now = timeProvider.GetUtcNow();
+            session.Renew(tokenPayload.PlayerName, tokenPayload.ExpiresAtUtc, now, options.Value.RenewalWindow);
+            await sessionRepository.SaveAsync(session, cancellationToken);
+
+            var result = tokenIssuer.IssueToken(session, now);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            ProfilesTelemetry.SessionsRenewed.Add(1);
+
+            return result;
         }
-
-        var now = timeProvider.GetUtcNow();
-        session.Renew(tokenPayload.PlayerName, tokenPayload.ExpiresAtUtc, now, options.Value.RenewalWindow);
-        await sessionRepository.SaveAsync(session, cancellationToken);
-
-        return tokenIssuer.IssueToken(session, now);
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }
