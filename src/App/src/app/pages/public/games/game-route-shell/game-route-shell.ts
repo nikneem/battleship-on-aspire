@@ -160,9 +160,6 @@ export class GameRouteShell implements OnInit, OnDestroy {
   protected readonly isGameOver = computed(() => this.gamePhase() >= 4);
   protected readonly isWinner = computed(() => this.winnerPlayerId() === this.myPlayerId());
   protected readonly outcome = computed<'winner' | 'loser'>(() => this.isWinner() ? 'winner' : 'loser');
-  protected readonly showFireButton = computed(
-    () => this.inCombatMode() && !this.isGameOver() && this.selectedAttackCell() !== null && this.isMyTurn()
-  );
   protected readonly opponentName = computed(
     () => (this.opponentPlayerName() ?? 'AWAITING OPPONENT').toUpperCase()
   );

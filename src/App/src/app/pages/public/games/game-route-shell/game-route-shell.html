@@ -29,16 +29,14 @@
           <p class="state-lock" [class.state-lock--your-turn]="isMyTurn()">
             {{ turnIndicatorLabel() }}
           </p>
-          @if (showFireButton()) {
-            <button
-              class="command-link command-link--attention"
-              type="button"
-              [disabled]="firing()"
-              (click)="fireShot()"
-            >
-              {{ firing() ? 'FIRING...' : 'FIRE' }}
-            </button>
-          }
+          <button
+            class="command-link command-link--launch"
+            type="button"
+            [disabled]="firing() || !isMyTurn() || selectedAttackCell() === null"
+            (click)="fireShot()"
+          >
+            <span class="launch-text">{{ firing() ? 'LAUNCHING...' : 'LAUNCH' }}</span>
+          </button>
         }
       } @else if (waitingForOpponentReady()) {
         <p class="state-lock">READY SIGNAL SENT // AWAITING OPPOSING COMMANDER</p>
