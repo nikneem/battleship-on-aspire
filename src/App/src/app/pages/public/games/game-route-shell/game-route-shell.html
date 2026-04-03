@@ -184,6 +184,12 @@
                   <span class="ship-card__name">{{ ship.label }}</span>
                   <span class="ship-card__length">{{ ship.length }} CELLS</span>
                 </span>
+                <img
+                  class="ship-card__image"
+                  [src]="'/images/hulls/' + ship.id + '.png'"
+                  [alt]="ship.label + ' hull'"
+                  aria-hidden="true"
+                />
                 <span class="ship-card__status">{{ ship.statusLabel }}</span>
               </button>
             </li>

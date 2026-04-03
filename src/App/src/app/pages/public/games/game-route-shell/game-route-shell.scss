@@ -231,6 +231,28 @@
   font-size: 0.8rem;
 }
 
+.ship-card__image {
+  display: block;
+  width: 100%;
+  height: 3.5rem;
+  object-fit: contain;
+  object-position: center;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgb(0 229 255 / 0.3));
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.ship-card:hover .ship-card__image,
+.ship-card:focus-visible .ship-card__image,
+.ship-card.is-selected .ship-card__image {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgb(0 229 255 / 0.5));
+}
+
+.ship-card.is-placed .ship-card__image {
+  opacity: 0.5;
+}
+
 .ship-card__status,
 .deck,
 .state-lock,
