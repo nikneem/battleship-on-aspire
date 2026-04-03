@@ -153,6 +153,7 @@
                     class="setup-board__ship-image"
                     [src]="'/images/hulls/' + ship.id + '.png'"
                     [alt]="ship.label"
+                    [style.--ship-cells]="ship.length"
                   />
                   @if (!fleetLocked()) {
                     <span

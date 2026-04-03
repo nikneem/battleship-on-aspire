@@ -183,16 +183,18 @@
   transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
-/* For vertical ships: swap the image dimensions and rotate so the
-   landscape sprite fills the portrait container correctly. */
+/* For vertical ships: the container is portrait (1 cell wide × L cells tall).
+   We size the image to L×1 cells using only cqw (container width = 1 cell),
+   which is always definite in a CSS grid track, then rotate it into place. */
 .setup-board__ship[data-orientation='vertical'] .setup-board__ship-image {
-  width: 100cqh;
+  width: calc(100cqw * var(--ship-cells, 1));
   height: 100cqw;
   inset: auto;
-  top: calc((100cqh - 100cqw) / 2);
-  left: calc((100cqw - 100cqh) / 2);
+  top: calc(50cqw * (var(--ship-cells, 1) - 1));
+  left: calc(50cqw * (1 - var(--ship-cells, 1)));
   transform: rotate(-90deg);
   transform-origin: center;
+  object-fit: contain;
 }
 
 .setup-board__ship:hover .setup-board__ship-image,
