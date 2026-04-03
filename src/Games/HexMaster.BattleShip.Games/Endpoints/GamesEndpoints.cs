@@ -159,7 +159,6 @@ public static class GamesEndpoints
                 "/{gameCode}/lock",
                 async (
                     string gameCode,
-                    LockFleetRequestDto _,
                     ClaimsPrincipal user,
                     ICommandHandler<LockFleetCommand, GameStateResponseDto> commandHandler,
                     CancellationToken cancellationToken) =>

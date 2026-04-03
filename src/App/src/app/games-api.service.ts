@@ -85,11 +85,11 @@ export class GamesApiService {
   }
 
   markReady(gameCode: string): Observable<GameStateResponse> {
-    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/ready`, {});
+    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/ready`, null);
   }
 
   lockFleet(gameCode: string): Observable<GameStateResponse> {
-    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/lock`, {});
+    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/lock`, null);
   }
 
   fireShot(gameCode: string, row: number, column: number): Observable<GameStateResponse> {
