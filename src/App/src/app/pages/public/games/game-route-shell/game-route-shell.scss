@@ -350,6 +350,10 @@
     grid-template-columns: 1fr;
   }
 
+  .header-card--player   { order: 1; }
+  .header-card--opponent { order: 2; }
+  .header-card--state    { order: 3; }
+
   .setup-board {
     min-height: min(85vw, 32rem);
   }
