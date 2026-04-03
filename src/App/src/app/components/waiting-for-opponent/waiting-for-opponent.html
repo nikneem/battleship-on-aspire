@@ -1,0 +1,27 @@
+<div class="overlay-backdrop" role="dialog" aria-modal="true" aria-labelledby="waiting-title">
+  <div class="overlay-panel">
+    <p class="eyebrow">LOBBY // AWAITING OPPONENT</p>
+    <h2 id="waiting-title" class="panel-heading">GAME CODE</h2>
+
+    <div class="code-block">
+      <span class="code-value" aria-label="Game code: {{ gameCode() }}">{{ gameCode() }}</span>
+      <button
+        class="copy-btn"
+        type="button"
+        [attr.aria-label]="'Copy game code ' + gameCode()"
+        (click)="copyCode()"
+      >
+        {{ copied() ? '✓ COPIED' : 'COPY' }}
+      </button>
+    </div>
+
+    <p class="deck">Share this code with your opponent to begin the mission.</p>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <p class="eyebrow">COMMAND DOWNTIME // PONG</p>
+    <p class="hint">Move your mouse or drag on the canvas to control the bottom paddle.</p>
+
+    <bat-mini-pong />
+  </div>
+</div>
