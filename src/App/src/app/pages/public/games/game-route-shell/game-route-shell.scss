@@ -163,45 +163,16 @@
   z-index: 1;
   min-width: 0;
   padding: 0;
-  container-type: size;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgb(0 229 255 / 0.2), rgb(0 229 255 / 0.08)),
-    rgb(5 12 19 / 0.92);
+  background-color: rgb(5 12 19 / 0.92);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   pointer-events: auto;
+  cursor: pointer;
 }
 
-.setup-board__ship-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  opacity: 0.9;
-  filter: drop-shadow(0 0 5px rgb(0 229 255 / 0.45));
-  transition: opacity 0.2s ease, filter 0.2s ease;
-}
-
-/* For vertical ships: the container is portrait (1 cell wide × L cells tall).
-   We size the image to L×1 cells using only cqw (container width = 1 cell),
-   which is always definite in a CSS grid track, then rotate it into place. */
-.setup-board__ship[data-orientation='vertical'] .setup-board__ship-image {
-  width: calc(100cqw * var(--ship-cells, 1));
-  height: 100cqw;
-  inset: auto;
-  top: calc(50cqw * (var(--ship-cells, 1) - 1));
-  left: calc(50cqw * (1 - var(--ship-cells, 1)));
-  transform: rotate(-90deg);
-  transform-origin: center;
-  object-fit: contain;
-}
-
-.setup-board__ship:hover .setup-board__ship-image,
-.setup-board__ship:focus-visible .setup-board__ship-image,
-.setup-board__ship.is-selected .setup-board__ship-image {
-  opacity: 1;
-  filter: drop-shadow(0 0 10px rgb(0 229 255 / 0.7));
+.setup-board__ship[data-orientation='vertical'] {
+  transform: rotate(90deg);
 }
 
 .setup-board__ship.is-selected {
