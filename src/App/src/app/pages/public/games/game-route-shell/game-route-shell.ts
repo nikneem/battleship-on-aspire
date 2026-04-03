@@ -8,6 +8,7 @@ import {
   signal
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription, switchMap } from 'rxjs';
 
 import { AnonymousPlayerIdentityService } from '../../../../anonymous-player-identity.service';
@@ -455,7 +456,11 @@ export class GameRouteShell implements OnInit, OnDestroy {
     this.subs.add(
       this.gamesApi.getGameState(this.gameCode).subscribe({
         next: (state) => this.applyGameState(state),
-        error: (err) => {
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 404) {
+            this.router.navigate(['/']);
+            return;
+          }
           this.error.set('Failed to load game state.');
           this.loading.set(false);
           console.error(err);
