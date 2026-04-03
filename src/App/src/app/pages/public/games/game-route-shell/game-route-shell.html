@@ -142,7 +142,7 @@
                   [class.is-selected]="ship.id === selectedShipId()"
                   [style.gridColumn]="ship.gridColumn"
                   [style.gridRow]="ship.gridRow"
-                  [style.backgroundImage]="'url(/images/hulls/' + ship.id + '.png)'"
+                  [style.--ship-cells]="ship.length"
                   [attr.data-ship-id]="ship.id"
                   [attr.data-orientation]="ship.orientation"
                   [attr.aria-label]="ship.label + ' occupying ' + ship.occupiedCellsLabel"
@@ -153,6 +153,11 @@
                   (dragstart)="handleShipDragStart($event, ship.id)"
                   (dragend)="handleShipDragEnd()"
                 >
+                  <div
+                    class="hull-visual"
+                    [style.backgroundImage]="'url(/images/hulls/' + ship.id + '.png)'"
+                    aria-hidden="true"
+                  ></div>
                   @if (!fleetLocked()) {
                     <button
                       class="ship-rotate-btn"

@@ -163,16 +163,30 @@
   z-index: 1;
   min-width: 0;
   padding: 0;
-  background-color: rgb(5 12 19 / 0.92);
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  overflow: hidden;
   pointer-events: auto;
   cursor: pointer;
 }
 
-.setup-board__ship[data-orientation='vertical'] {
-  transform: rotate(90deg);
+.hull-visual {
+  position: absolute;
+  inset: 0;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+/* Vertical ship: outer div is 1-cell wide × N-cells tall (portrait).
+   We size hull-visual as N-wide × 1-tall (landscape), center it, and rotate -90deg.
+   After rotation the visual is 1-wide × N-tall — matching the outer div exactly. */
+.setup-board__ship[data-orientation='vertical'] .hull-visual {
+  width: calc(100% * var(--ship-cells, 1));
+  height: calc(100% / var(--ship-cells, 1));
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
 }
 
 .setup-board__ship.is-selected {

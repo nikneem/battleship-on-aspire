@@ -1,8 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import { AnonymousPlayerIdentityService } from './anonymous-player-identity.service';
 
 export interface CreateGameResponse {
   readonly gameCode: string;
@@ -64,83 +62,35 @@ export interface ShipPlacementRequest {
 @Injectable({ providedIn: 'root' })
 export class GamesApiService {
   private readonly httpClient = inject(HttpClient);
-  private readonly identityService = inject(AnonymousPlayerIdentityService);
 
   createGame(joinSecret: string): Observable<CreateGameResponse> {
-    const session = this.identityService.session();
-
-    if (session === null) {
-      throw new Error('An anonymous player session must exist before creating a game.');
-    }
-
-    return this.httpClient.post<CreateGameResponse>(
-      '/api/games',
-      {
-        joinSecret: joinSecret.trim() === '' ? null : joinSecret.trim()
-      },
-      {
-        headers: new HttpHeaders({
-          Authorization: `Bearer ${session.accessToken}`
-        })
-      }
-    );
-  }
-
-  joinGame(gameCode: string, joinSecret?: string): Observable<GameLobbyResponse> {
-    const session = this.requireSession();
-    return this.httpClient.post<GameLobbyResponse>(
-      '/api/games/join',
-      {
-        gameCode: gameCode.trim(),
-        joinSecret: joinSecret?.trim() || null
-      },
-      { headers: this.authHeaders(session.accessToken) }
-    );
-  }
-
-  getGameState(gameCode: string): Observable<GameStateResponse> {
-    const session = this.requireSession();
-    return this.httpClient.get<GameStateResponse>(`/api/games/${gameCode}`, {
-      headers: this.authHeaders(session.accessToken)
+    return this.httpClient.post<CreateGameResponse>('/api/games', {
+      joinSecret: joinSecret.trim() === '' ? null : joinSecret.trim()
     });
   }
 
+  joinGame(gameCode: string, joinSecret?: string): Observable<GameLobbyResponse> {
+    return this.httpClient.post<GameLobbyResponse>('/api/games/join', {
+      gameCode: gameCode.trim(),
+      joinSecret: joinSecret?.trim() || null
+    });
+  }
+
+  getGameState(gameCode: string): Observable<GameStateResponse> {
+    return this.httpClient.get<GameStateResponse>(`/api/games/${gameCode}`);
+  }
+
   submitFleet(gameCode: string, ships: readonly ShipPlacementRequest[]): Observable<GameStateResponse> {
-    const session = this.requireSession();
-    return this.httpClient.put<GameStateResponse>(
-      `/api/games/${gameCode}/fleet`,
-      { ships },
-      { headers: this.authHeaders(session.accessToken) }
-    );
+    return this.httpClient.put<GameStateResponse>(`/api/games/${gameCode}/fleet`, { ships });
   }
 
   lockFleet(gameCode: string): Observable<GameStateResponse> {
-    const session = this.requireSession();
-    return this.httpClient.post<GameStateResponse>(
-      `/api/games/${gameCode}/lock`,
-      {},
-      { headers: this.authHeaders(session.accessToken) }
-    );
+    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/lock`, {});
   }
 
   fireShot(gameCode: string, row: number, column: number): Observable<GameStateResponse> {
-    const session = this.requireSession();
-    return this.httpClient.post<GameStateResponse>(
-      `/api/games/${gameCode}/shots`,
-      { target: { row, column } },
-      { headers: this.authHeaders(session.accessToken) }
-    );
-  }
-
-  private requireSession() {
-    const session = this.identityService.session();
-    if (session === null) {
-      throw new Error('An anonymous player session must exist before calling this API.');
-    }
-    return session;
-  }
-
-  private authHeaders(token: string): HttpHeaders {
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.httpClient.post<GameStateResponse>(`/api/games/${gameCode}/shots`, {
+      target: { row, column }
+    });
   }
 }

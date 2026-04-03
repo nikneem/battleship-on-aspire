@@ -30,6 +30,20 @@ export class AnonymousPlayerIdentityService {
 
   readonly session = signal<AnonymousPlayerIdentity | null>(this.readStoredSession());
 
+  renewSession(accessToken: string): Observable<AnonymousPlayerIdentity> {
+    return this.httpClient
+      .post<AnonymousPlayerSessionResponse>('/api/profiles/anonymous-sessions/renew', { accessToken })
+      .pipe(
+        map((response) => ({
+          playerId: response.playerId,
+          playerName: response.playerName,
+          accessToken: response.accessToken,
+          expiresAtUtc: response.expiresAtUtc
+        })),
+        tap((session) => this.persistSession(session))
+      );
+  }
+
   establish(playerName: string): Observable<AnonymousPlayerIdentity> {
     const trimmedPlayerName = playerName.trim();
 
