@@ -19,6 +19,8 @@ public sealed class LockFleetHandler(
         LockFleetCommand command,
         CancellationToken cancellationToken = default)
     {
+        await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
+
         var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
                    ?? throw new KeyNotFoundException("The requested game could not be found.");
 

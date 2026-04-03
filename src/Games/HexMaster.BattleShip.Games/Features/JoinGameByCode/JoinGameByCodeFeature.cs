@@ -22,6 +22,8 @@ public sealed class JoinGameByCodeHandler(
         JoinGameByCodeCommand command,
         CancellationToken cancellationToken = default)
     {
+        await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
+
         var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
                    ?? throw new KeyNotFoundException("The requested game could not be found.");
         var storedSecretHash = game is Game concreteGame ? concreteGame.ToDocument().ProtectedSecretHash ?? string.Empty : string.Empty;
