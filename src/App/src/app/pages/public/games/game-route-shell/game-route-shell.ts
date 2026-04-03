@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   OnDestroy,
   OnInit,
@@ -150,6 +151,16 @@ export class GameRouteShell implements OnInit, OnDestroy {
   protected readonly opponentBoardState = signal<OpponentBoardState>({ knownShots: [] });
   protected readonly selectedAttackCell = signal<SelectedCell | null>(null);
   protected readonly firing = signal(false);
+
+  // ── Combat tab selection ──────────────────────────────────────────────────
+  private readonly manualCombatTab = signal<'attack' | 'defend' | null>(null);
+  protected readonly activeCombatTab = computed<'attack' | 'defend'>(
+    () => this.manualCombatTab() ?? (this.isMyTurn() ? 'attack' : 'defend')
+  );
+  private readonly _turnTabSync = effect(() => {
+    this.isMyTurn(); // track turn changes
+    this.manualCombatTab.set(null); // reset manual override when turn switches
+  }, { allowSignalWrites: true });
 
   // ── Computed ───────────────────────────────────────────────────────────────
   protected readonly myPlayerId = computed(() => this.identityService.session()?.playerId ?? null);
@@ -426,6 +437,10 @@ export class GameRouteShell implements OnInit, OnDestroy {
   // ── Combat actions ─────────────────────────────────────────────────────────
   protected onCellSelected(cell: SelectedCell): void {
     this.selectedAttackCell.set(cell);
+  }
+
+  protected selectCombatTab(tab: 'attack' | 'defend'): void {
+    this.manualCombatTab.set(tab);
   }
 
   protected fireShot(): void {

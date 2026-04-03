@@ -390,6 +390,63 @@
   .gameplay-grid--combat {
     grid-template-columns: 1fr;
   }
+
+  .combat-tabs {
+    display: flex;
+  }
+
+  .combat-panel:not(.is-active-tab) {
+    display: none;
+  }
+}
+
+/* ── Combat tab bar ───────────────────────────── */
+
+.combat-tabs {
+  display: none;
+  grid-column: 1 / -1;
+  gap: 0;
+  border: 1px solid var(--battle-ops-border-color);
+  background: var(--battle-ops-panel-elevated);
+}
+
+.combat-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--battle-ops-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+
+  & + & {
+    border-left: 1px solid var(--battle-ops-border-color);
+  }
+
+  &:hover {
+    color: var(--battle-ops-text-primary);
+    background: rgb(0 229 255 / 0.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--battle-ops-accent-color);
+    outline-offset: -2px;
+  }
+}
+
+.combat-tab--active {
+  color: var(--battle-ops-accent-color);
+  border-bottom-color: var(--battle-ops-accent-color);
+  background: rgb(0 229 255 / 0.07);
 }
 
 /* ── Launch button ─────────────────────────────────────────────────────────── */

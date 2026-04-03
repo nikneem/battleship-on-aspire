@@ -66,7 +66,26 @@
 
   @if (inCombatMode()) {
     <section class="gameplay-grid gameplay-grid--combat">
-      <article class="combat-panel tactical-panel" aria-labelledby="attack-board-title">
+      <div class="combat-tabs" role="tablist" aria-label="Combat board selection">
+        <button
+          class="combat-tab"
+          role="tab"
+          type="button"
+          [class.combat-tab--active]="activeCombatTab() === 'attack'"
+          [attr.aria-selected]="activeCombatTab() === 'attack'"
+          (click)="selectCombatTab('attack')"
+        >⚔ ATTACK</button>
+        <button
+          class="combat-tab"
+          role="tab"
+          type="button"
+          [class.combat-tab--active]="activeCombatTab() === 'defend'"
+          [attr.aria-selected]="activeCombatTab() === 'defend'"
+          (click)="selectCombatTab('defend')"
+        >🛡 DEFEND</button>
+      </div>
+
+      <article class="combat-panel tactical-panel" [class.is-active-tab]="activeCombatTab() === 'attack'" aria-labelledby="attack-board-title">
         <div class="panel-heading">
           <p class="eyebrow">ATTACK BOARD // ENEMY WATERS</p>
           <h2 id="attack-board-title">{{ isMyTurn() ? 'SELECT TARGET' : 'AWAITING TURN' }}</h2>
@@ -80,7 +99,7 @@
         />
       </article>
 
-      <article class="combat-panel tactical-panel" aria-labelledby="defend-board-title">
+      <article class="combat-panel tactical-panel" [class.is-active-tab]="activeCombatTab() === 'defend'" aria-labelledby="defend-board-title">
         <div class="panel-heading">
           <p class="eyebrow">DEFEND BOARD // HOME WATERS</p>
           <h2 id="defend-board-title">YOUR FLEET</h2>
