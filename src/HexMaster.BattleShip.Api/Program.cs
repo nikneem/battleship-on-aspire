@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using HexMaster.BattleShip.Api.Infrastructure;
 using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games;
@@ -18,6 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+});
 builder.Services.AddGamesModule();
 builder.Services.AddProfilesModule(builder.Configuration);
 builder.Services.AddRealtimeModule();

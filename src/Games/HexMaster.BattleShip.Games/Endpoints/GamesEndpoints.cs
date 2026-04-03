@@ -14,6 +14,7 @@ using HexMaster.BattleShip.Games.Features.SubmitFleet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace HexMaster.BattleShip.Games.Endpoints;
 
@@ -135,8 +136,13 @@ public static class GamesEndpoints
                     SubmitFleetRequestDto requestDto,
                     ClaimsPrincipal user,
                     ICommandHandler<SubmitFleetCommand, GameStateResponseDto> commandHandler,
+                    ILoggerFactory loggerFactory,
                     CancellationToken cancellationToken) =>
                 {
+                    var logger = loggerFactory.CreateLogger("GamesEndpoints.SubmitFleet");
+                    logger.LogInformation("SubmitFleet: gameCode={GameCode}, ships={ShipCount}",
+                        gameCode, requestDto.Ships?.Count.ToString() ?? "NULL");
+
                     if (!TryReadPlayer(user, out var player))
                     {
                         return Results.Unauthorized();
@@ -145,7 +151,8 @@ public static class GamesEndpoints
                     return await Execute(
                         async () => Results.Ok(await commandHandler.HandleAsync(
                             new SubmitFleetCommand(gameCode, player.PlayerId, GameMappings.ToShipPlacements(requestDto.Ships)),
-                            cancellationToken)));
+                            cancellationToken)),
+                        loggerFactory.CreateLogger("GamesEndpoints"));
                 })
             .WithName("SubmitFleet");
 
@@ -236,7 +243,7 @@ public static class GamesEndpoints
         return endpoints;
     }
 
-    private static async Task<IResult> Execute(Func<Task<IResult>> callback)
+    private static async Task<IResult> Execute(Func<Task<IResult>> callback, ILogger? logger = null)
     {
         try
         {
@@ -244,10 +251,12 @@ public static class GamesEndpoints
         }
         catch (ArgumentException ex)
         {
+            logger?.LogWarning(ex, "Fleet validation failed (ArgumentException): {Message}", ex.Message);
             return Results.ValidationProblem(ToValidationErrors(ex));
         }
         catch (InvalidOperationException ex)
         {
+            logger?.LogWarning(ex, "Fleet validation failed (InvalidOperationException): {Message}", ex.Message);
             return Results.ValidationProblem(ToValidationErrors(ex));
         }
         catch (KeyNotFoundException)
