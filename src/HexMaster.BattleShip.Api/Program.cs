@@ -13,10 +13,22 @@ using HexMaster.BattleShip.Realtime.Endpoints;
 using HexMaster.BattleShip.Realtime.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddSource("HexMaster.BattleShip.Profiles")
+        .AddSource("HexMaster.BattleShip.Games")
+        .AddSource("HexMaster.BattleShip.Realtime"))
+    .WithMetrics(metrics => metrics
+        .AddMeter("HexMaster.BattleShip.Profiles")
+        .AddMeter("HexMaster.BattleShip.Games")
+        .AddMeter("HexMaster.BattleShip.Realtime"));
 
 builder.Services.AddOpenApi();
 builder.Services.ConfigureHttpJsonOptions(options =>

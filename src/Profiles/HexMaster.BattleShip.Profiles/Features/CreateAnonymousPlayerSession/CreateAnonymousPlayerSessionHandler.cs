@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Profiles.Abstractions.Configuration;
 using HexMaster.BattleShip.Profiles.Abstractions.DataTransferObjects;
@@ -17,14 +18,31 @@ public sealed class CreateAnonymousPlayerSessionHandler(
         CreateAnonymousPlayerSessionCommand command,
         CancellationToken cancellationToken = default)
     {
-        var createdAtUtc = timeProvider.GetUtcNow();
-        var session = AnonymousPlayerSession.Create(
-            command.PlayerName,
-            createdAtUtc,
-            options.Value.PlayerRecordTimeToLive);
+        using var activity = ProfilesTelemetry.Source.StartActivity("CreateAnonymousPlayerSession");
+        activity?.SetTag("player.name", command.PlayerName);
 
-        await sessionRepository.SaveAsync(session, cancellationToken);
+        try
+        {
+            var createdAtUtc = timeProvider.GetUtcNow();
+            var session = AnonymousPlayerSession.Create(
+                command.PlayerName,
+                createdAtUtc,
+                options.Value.PlayerRecordTimeToLive);
 
-        return tokenIssuer.IssueToken(session, createdAtUtc);
+            await sessionRepository.SaveAsync(session, cancellationToken);
+
+            var result = tokenIssuer.IssueToken(session, createdAtUtc);
+
+            activity?.SetTag("player.id", result.PlayerId);
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            ProfilesTelemetry.SessionsCreated.Add(1);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }

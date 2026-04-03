@@ -211,6 +211,19 @@ Source:
 
 - `.github\agents\domain-model-enforcer.agent.md`
 
+### `otel-logging-tracing`
+
+Use for:
+
+- adding OpenTelemetry activities and traces to handlers, hubs, and services
+- adding metrics counters to domain telemetry classes
+- reviewing whether a new handler or hub method is properly instrumented
+- creating a new domain telemetry class and wiring it into `Program.cs`
+
+Source:
+
+- `.github\agents\otel-logging-tracing.agent.md`
+
 ## Skills to prefer
 
 Prefer repository skills when applicable:
@@ -267,6 +280,7 @@ When changing backend code:
 - wire the module into the API via DI
 - expose HTTP endpoints that accept/return DTOs only
 - add focused tests in the domain test project
+- **add OpenTelemetry instrumentation to every new handler and hub method** (see below)
 
 When changing frontend code:
 
@@ -281,3 +295,87 @@ When changing specs:
 - update OpenSpec artifacts first when the work is change-driven
 - bind specs to GitHub issues only when explicitly intended
 - keep `tasks.md` accurate as implementation progresses
+
+## OpenTelemetry instrumentation (mandatory for all backend changes)
+
+Every command handler, query handler, SignalR hub method, and background service operation MUST be instrumented with OpenTelemetry. This is not optional — it is a required step for every backend change, on par with writing tests.
+
+### Checklist for every new handler or hub method
+
+- [ ] The domain has a `{Domain}Telemetry.cs` class — create one if missing (see pattern below)
+- [ ] `HandleAsync` starts with `using var activity = {Domain}Telemetry.Source.StartActivity("{OperationName}");`
+- [ ] At least one context tag is set (`game.code`, `game.player_id`, etc.) before the business logic
+- [ ] All business logic is wrapped in `try { ... activity?.SetStatus(ActivityStatusCode.Ok); return result; } catch (Exception ex) { activity?.SetStatus(ActivityStatusCode.Error, ex.Message); throw; }`
+- [ ] Command handlers increment a `Counter<int>` from the telemetry class after `SetStatus(Ok)` — add a new counter if none exists for this operation
+- [ ] Query handlers do NOT increment metric counters (reads are tracked via traces only)
+- [ ] If the telemetry class is new, its source and meter names are registered in `src\HexMaster.BattleShip.Api\Program.cs` under the `AddOpenTelemetry()` call
+
+### Telemetry class pattern
+
+Each domain implementation project (`HexMaster.BattleShip.{Domain}`) contains exactly one internal telemetry class at the root namespace:
+
+```csharp
+// src/{Domain}/HexMaster.BattleShip.{Domain}/{Domain}Telemetry.cs
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+
+namespace HexMaster.BattleShip.{Domain};
+
+internal static class {Domain}Telemetry
+{
+    public const string SourceName = "HexMaster.BattleShip.{Domain}";
+    public static readonly ActivitySource Source = new(SourceName);
+    private static readonly Meter Meter = new(SourceName);
+
+    // One counter per significant state-changing operation
+    public static readonly Counter<int> ExampleOperationsCompleted =
+        Meter.CreateCounter<int>(
+            "battleship.{domain}.operations.completed",
+            description: "Number of {domain} operations completed");
+}
+```
+
+### Handler instrumentation pattern
+
+```csharp
+public async Task<TResult> HandleAsync(TCommand command, CancellationToken cancellationToken = default)
+{
+    using var activity = {Domain}Telemetry.Source.StartActivity("{OperationName}");
+    activity?.SetTag("game.code", command.GameCode);
+    activity?.SetTag("game.player_id", command.PlayerId);
+
+    try
+    {
+        // ... business logic ...
+
+        activity?.SetStatus(ActivityStatusCode.Ok);
+        {Domain}Telemetry.OperationCounter.Add(1); // commands only
+        return result;
+    }
+    catch (Exception ex)
+    {
+        activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+        throw;
+    }
+}
+```
+
+### OTel pipeline registration in Program.cs
+
+When adding a new domain telemetry class, register it in `src\HexMaster.BattleShip.Api\Program.cs`:
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(t => t
+        .AddSource("HexMaster.BattleShip.Profiles")
+        .AddSource("HexMaster.BattleShip.Games")
+        .AddSource("HexMaster.BattleShip.Realtime")
+        .AddSource("HexMaster.BattleShip.{NewDomain}")) // add new domain here
+    .WithMetrics(m => m
+        .AddMeter("HexMaster.BattleShip.Profiles")
+        .AddMeter("HexMaster.BattleShip.Games")
+        .AddMeter("HexMaster.BattleShip.Realtime")
+        .AddMeter("HexMaster.BattleShip.{NewDomain}")); // add new domain here
+```
+
+For full guidance, use the `otel-logging-tracing` agent (`.github\agents\otel-logging-tracing.agent.md`).

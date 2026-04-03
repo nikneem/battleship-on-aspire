@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
@@ -22,20 +23,38 @@ public sealed class JoinGameByCodeHandler(
         JoinGameByCodeCommand command,
         CancellationToken cancellationToken = default)
     {
-        await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
+        using var activity = GamesTelemetry.Source.StartActivity("JoinGameByCode");
+        activity?.SetTag("game.code", command.GameCode);
+        activity?.SetTag("game.player_id", command.PlayerId);
+        activity?.SetTag("game.player_name", command.PlayerName);
 
-        var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
-                   ?? throw new KeyNotFoundException("The requested game could not be found.");
-        var storedSecretHash = game is Game concreteGame ? concreteGame.ToDocument().ProtectedSecretHash ?? string.Empty : string.Empty;
-        var secretValidated = !game.IsProtected || secretHasher.VerifySecret(command.JoinSecret ?? string.Empty, storedSecretHash);
+        try
+        {
+            await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
 
-        game.JoinGuest(command.PlayerId, command.PlayerName, secretValidated);
+            var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
+                       ?? throw new KeyNotFoundException("The requested game could not be found.");
+            var storedSecretHash = game is Game concreteGame ? concreteGame.ToDocument().ProtectedSecretHash ?? string.Empty : string.Empty;
+            var secretValidated = !game.IsProtected || secretHasher.VerifySecret(command.JoinSecret ?? string.Empty, storedSecretHash);
 
-        await gameRepository.SaveAsync(game, cancellationToken);
-        await eventBus.PublishAsync(
-            new PlayerJoinedGameIntegrationEvent(game.GameCode, command.PlayerId, command.PlayerName),
-            cancellationToken);
+            game.JoinGuest(command.PlayerId, command.PlayerName, secretValidated);
 
-        return GameMappings.ToLobbyResponseDto(game);
+            await gameRepository.SaveAsync(game, cancellationToken);
+            await eventBus.PublishAsync(
+                new PlayerJoinedGameIntegrationEvent(game.GameCode, command.PlayerId, command.PlayerName),
+                cancellationToken);
+
+            var result = GameMappings.ToLobbyResponseDto(game);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            GamesTelemetry.GamesJoined.Add(1);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }

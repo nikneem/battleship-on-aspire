@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Core.Eventing;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
@@ -19,26 +20,42 @@ public sealed class LockFleetHandler(
         LockFleetCommand command,
         CancellationToken cancellationToken = default)
     {
-        await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
+        using var activity = GamesTelemetry.Source.StartActivity("LockFleet");
+        activity?.SetTag("game.code", command.GameCode);
+        activity?.SetTag("game.player_id", command.PlayerId);
 
-        var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
-                   ?? throw new KeyNotFoundException("The requested game could not be found.");
-
-        var hostGoesFirst = randomProvider.NextBool();
-        game.LockFleet(command.PlayerId, hostGoesFirst);
-
-        await gameRepository.SaveAsync(game, cancellationToken);
-        await eventBus.PublishAsync(
-            new FleetLockedIntegrationEvent(game.GameCode, command.PlayerId),
-            cancellationToken);
-
-        if (game.Phase == GamePhase.InProgress)
+        try
         {
-            await eventBus.PublishAsync(
-                new GameStartedIntegrationEvent(game.GameCode, game.CurrentTurnPlayerId!),
-                cancellationToken);
-        }
+            await using var _ = await gameRepository.BeginUpdateAsync(command.GameCode, cancellationToken);
 
-        return GameMappings.ToStateResponseDto(game, command.PlayerId);
+            var game = await gameRepository.GetByCodeAsync(command.GameCode, cancellationToken)
+                       ?? throw new KeyNotFoundException("The requested game could not be found.");
+
+            var hostGoesFirst = randomProvider.NextBool();
+            game.LockFleet(command.PlayerId, hostGoesFirst);
+
+            await gameRepository.SaveAsync(game, cancellationToken);
+            await eventBus.PublishAsync(
+                new FleetLockedIntegrationEvent(game.GameCode, command.PlayerId),
+                cancellationToken);
+
+            if (game.Phase == GamePhase.InProgress)
+            {
+                await eventBus.PublishAsync(
+                    new GameStartedIntegrationEvent(game.GameCode, game.CurrentTurnPlayerId!),
+                    cancellationToken);
+            }
+
+            var result = GameMappings.ToStateResponseDto(game, command.PlayerId);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }

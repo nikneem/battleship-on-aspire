@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using HexMaster.BattleShip.Core.Cqrs;
 using HexMaster.BattleShip.Games.Abstractions.DataTransferObjects;
 using HexMaster.BattleShip.Games.Abstractions.Services;
@@ -14,9 +15,25 @@ public sealed class GetGameStateForPlayerHandler(IGameRepository gameRepository)
         GetGameStateForPlayerQuery query,
         CancellationToken cancellationToken = default)
     {
-        var game = await gameRepository.GetByCodeAsync(query.GameCode, cancellationToken)
-                   ?? throw new KeyNotFoundException("The requested game could not be found.");
+        using var activity = GamesTelemetry.Source.StartActivity("GetGameStateForPlayer");
+        activity?.SetTag("game.code", query.GameCode);
+        activity?.SetTag("game.player_id", query.PlayerId);
 
-        return GameMappings.ToStateResponseDto(game, query.PlayerId);
+        try
+        {
+            var game = await gameRepository.GetByCodeAsync(query.GameCode, cancellationToken)
+                       ?? throw new KeyNotFoundException("The requested game could not be found.");
+
+            var result = GameMappings.ToStateResponseDto(game, query.PlayerId);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
+        }
     }
 }
