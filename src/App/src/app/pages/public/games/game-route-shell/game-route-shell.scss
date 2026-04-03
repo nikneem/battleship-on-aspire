@@ -161,32 +161,86 @@
 .setup-board__ship {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-width: 0;
-  padding: 0.35rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  padding: 0;
+  container-type: size;
+  overflow: hidden;
   background:
     linear-gradient(180deg, rgb(0 229 255 / 0.2), rgb(0 229 255 / 0.08)),
     rgb(5 12 19 / 0.92);
   pointer-events: auto;
 }
 
-.setup-board__ship span {
-  font-size: 0.7rem;
-  text-align: center;
+.setup-board__ship-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 5px rgb(0 229 255 / 0.45));
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
-.setup-board__ship[data-orientation='vertical'] span {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
+/* For vertical ships: swap the image dimensions and rotate so the
+   landscape sprite fills the portrait container correctly. */
+.setup-board__ship[data-orientation='vertical'] .setup-board__ship-image {
+  width: 100cqh;
+  height: 100cqw;
+  inset: auto;
+  top: calc((100cqh - 100cqw) / 2);
+  left: calc((100cqw - 100cqh) / 2);
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.setup-board__ship:hover .setup-board__ship-image,
+.setup-board__ship:focus-visible .setup-board__ship-image,
+.setup-board__ship.is-selected .setup-board__ship-image {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgb(0 229 255 / 0.7));
 }
 
 .setup-board__ship.is-selected {
   border-color: var(--battle-ops-amber);
   box-shadow: 0 0 0 1px var(--battle-ops-amber), 0 0 22px rgb(255 179 0 / 0.16);
+}
+
+.ship-rotate-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--battle-ops-border-color);
+  background: rgb(5 12 19 / 0.88);
+  color: var(--battle-ops-electric-cyan);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  pointer-events: auto;
+
+  svg {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+}
+
+.setup-board__ship:hover .ship-rotate-btn,
+.setup-board__ship.is-selected .ship-rotate-btn {
+  opacity: 1;
+}
+
+.ship-rotate-btn:hover {
+  background: rgb(0 229 255 / 0.18);
+  border-color: var(--battle-ops-electric-cyan);
 }
 
 .ship-inventory {
@@ -229,6 +283,39 @@
 .ship-card__name,
 .ship-card__length {
   font-size: 0.8rem;
+}
+
+.ship-card__name {
+  display: inline-block;
+}
+
+@keyframes hull-running-light {
+  from { background-position: 100% center; }
+  to   { background-position: 0% center; }
+}
+
+.ship-card__name--awaiting {
+  background: linear-gradient(
+    90deg,
+    #7a0000 0%,
+    #7a0000 42%,
+    #cc1515 45%,
+    #ff3535 48%,
+    #ff5555 50%,
+    #ff3535 52%,
+    #cc1515 55%,
+    #7a0000 58%,
+    #7a0000 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: hull-running-light 2s linear infinite;
+}
+
+.ship-card__name--deployed {
+  color: #39d353;
 }
 
 .ship-card__image {

@@ -322,6 +322,13 @@ export class GameRouteShell implements OnInit, OnDestroy {
     this.placements.update((p) => ({ ...p, [selectedShip.id]: candidate }));
   }
 
+  protected rotateShip(shipId: string, event: Event): void {
+    event.stopPropagation();
+    if (this.fleetLocked()) return;
+    this.selectedShipId.set(shipId);
+    this.rotateSelectedShip();
+  }
+
   protected confirmReady(): void {
     if (!this.allShipsPlaced() || this.fleetLocked() || this.submittingFleet()) return;
 
