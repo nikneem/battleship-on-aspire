@@ -11,6 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription, switchMap } from 'rxjs';
 
 import { AnonymousPlayerIdentityService } from '../../../../anonymous-player-identity.service';
+import { BattleOpsSoundEffectsService } from '../../../../battle-ops-sound-effects.service';
 import {
   GamesApiService,
   GameStateResponse,
@@ -81,6 +82,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
   private readonly gamesApi = inject(GamesApiService);
   private readonly signalR = inject(GameSignalRService);
   private readonly router = inject(Router);
+  private readonly soundEffects = inject(BattleOpsSoundEffectsService);
   private readonly subs = new Subscription();
 
   protected readonly gameCode = inject(ActivatedRoute).snapshot.paramMap.get('gameCode') ?? '';
@@ -220,6 +222,14 @@ export class GameRouteShell implements OnInit, OnDestroy {
               { coordinate: { row: evt.targetRow, column: evt.targetColumn }, outcome: evt.outcome }
             ]
           }));
+          // Play hit/miss after the missile launch sound completes (~5 seconds)
+          setTimeout(() => {
+            if (evt.outcome === 0) {
+              this.soundEffects.playMissSplash();
+            } else {
+              this.soundEffects.playHitExplosion();
+            }
+          }, 5000);
         } else {
           this.ownBoardState.update((b) => ({
             ...b,
@@ -228,6 +238,12 @@ export class GameRouteShell implements OnInit, OnDestroy {
               { coordinate: { row: evt.targetRow, column: evt.targetColumn }, outcome: evt.outcome }
             ]
           }));
+          // Defender hears impact immediately (no launch sound plays on their side)
+          if (evt.outcome === 0) {
+            this.soundEffects.playMissSplash();
+          } else {
+            this.soundEffects.playHitExplosion();
+          }
         }
         // Flip turn to the player who did NOT fire
         this.currentTurnPlayerId.set(evt.firingPlayerId === myId ? this.opponentId() : myId);
@@ -416,6 +432,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
     const cell = this.selectedAttackCell();
     if (!cell || this.firing()) return;
 
+    this.soundEffects.playMissileLaunch();
     this.firing.set(true);
     this.subs.add(
       this.gamesApi.fireShot(this.gameCode, cell.row, cell.column).subscribe({
