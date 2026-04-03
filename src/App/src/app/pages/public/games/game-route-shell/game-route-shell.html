@@ -251,3 +251,7 @@
   />
 }
 
+@if (waitingForOpponent()) {
+  <bat-waiting-for-opponent [gameCode]="gameCode" />
+}
+

@@ -22,6 +22,7 @@ import {
 import { GameSignalRService } from '../../../../game-signal-r.service';
 import { BoardComponent, SelectedCell } from './components/board/board';
 import { GameOutcomeOverlayComponent } from '../../../../components/game-outcome-overlay/game-outcome-overlay';
+import { WaitingForOpponentDialogComponent } from '../../../../components/waiting-for-opponent/waiting-for-opponent';
 
 type ShipOrientation = 'horizontal' | 'vertical';
 
@@ -69,7 +70,7 @@ const shipDefinitions: readonly ShipDefinition[] = [
 
 @Component({
   selector: 'bat-game-route-shell',
-  imports: [RouterLink, BoardComponent, GameOutcomeOverlayComponent],
+  imports: [RouterLink, BoardComponent, GameOutcomeOverlayComponent, WaitingForOpponentDialogComponent],
   templateUrl: './game-route-shell.html',
   styleUrl: './game-route-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -171,6 +172,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
   protected readonly readyActionVisible = computed(
     () => this.allShipsPlaced() && !this.fleetLocked() && !this.inCombatMode() && !this.waitingForOpponentReady()
   );
+  protected readonly waitingForOpponent = computed(() => !this.loading() && this.gamePhase() === 0);
   protected readonly stateHeading = computed(() => {
     if (this.inCombatMode()) return 'COMBAT ACTIVE';
     if (this.fleetLocked()) return 'FLEET LOCKED';
