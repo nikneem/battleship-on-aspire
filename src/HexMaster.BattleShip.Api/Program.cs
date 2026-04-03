@@ -60,7 +60,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCloudEvents();
-app.UseHttpsRedirection();
+// Needs to be disabled for Dapr
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

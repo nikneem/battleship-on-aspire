@@ -13,7 +13,9 @@ public static class GamesSubscriptionEndpoints
 {
     public static IEndpointRouteBuilder MapGamesSubscriptions(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/subscriptions/games/connection-timed-out",
+        var group = app.MapGroup("/subscriptions/games").AllowAnonymous();
+
+        group.MapPost("/connection-timed-out",
             async (PlayerConnectionTimedOutIntegrationEvent evt,
                 ICommandHandler<AbandonGameCommand, GameStateResponseDto> handler) =>
             {
