@@ -369,10 +369,17 @@ internal sealed class PlayerBoard : IPlayerBoard
 
     internal static PlayerBoard Rehydrate(BoardDocument document)
     {
-        return new PlayerBoard(
-            document.IsLocked,
-            document.Ships.Select(static placement => PlacedShip.FromContract(placement)),
-            document.IncomingShots.Select(static shot => ShotRecord.FromContract(shot)));
+        var ships = document.Ships.Select(static p => PlacedShip.FromContract(p)).ToList();
+        var shots = document.IncomingShots.Select(static s => ShotRecord.FromContract(s)).ToList();
+
+        // Restore hit state from shot history so IsSunk correctly reflects the persisted game state.
+        // Without this, every load would reset hitCoordinates to empty, making AllShipsSunk permanently false.
+        foreach (var shot in shots.Where(static s => s.Outcome is ShotOutcome.Hit or ShotOutcome.Sunk))
+        {
+            ships.FirstOrDefault(s => s.Occupies(shot.Coordinate))?.ApplyHit(shot.Coordinate);
+        }
+
+        return new PlayerBoard(document.IsLocked, ships, shots);
     }
 
     public void SubmitFleet(IReadOnlyCollection<GameShipPlacement> placements)

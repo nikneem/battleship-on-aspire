@@ -98,6 +98,77 @@ public sealed class GameCommandHandlerTests
     }
 
     [Fact]
+    public async Task FireShotPublishesGameFinishedEventWhenLastShipIsSunk()
+    {
+        var repository = new InMemoryGameRepository();
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: true);
+        var capturedBus = new CapturingEventBus();
+        var fireShotHandler = new FireShotHandler(repository, capturedBus);
+
+        // Guest fleet is 5 vertical ships — 17 cells total; host sinks every one.
+        // Guest fires at safe rows (9,x) between each host turn.
+        GameCoordinate[] guestFleetCells =
+        [
+            new(0, 0), new(1, 0), new(2, 0), new(3, 0), new(4, 0), // carrier  (col 0, len 5)
+            new(0, 2), new(1, 2), new(2, 2), new(3, 2),             // battleship (col 2, len 4)
+            new(0, 4), new(1, 4), new(2, 4),                        // cruiser   (col 4, len 3)
+            new(0, 6), new(1, 6), new(2, 6),                        // submarine (col 6, len 3)
+            new(0, 8), new(1, 8)                                     // destroyer (col 8, len 2)
+        ];
+
+        // Guest fires at odd rows (all empty in host fleet) — 16 unique safe cells
+        var guestSafeCells = Enumerable
+            .Range(0, 16)
+            .Select(static i => new GameCoordinate(1 + (i / 10) * 2, i % 10))
+            .ToArray();
+
+        for (var i = 0; i < guestFleetCells.Length; i++)
+        {
+            await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "host-1", guestFleetCells[i]));
+
+            // Guest fires back after every shot except the final winning shot
+            if (i < guestFleetCells.Length - 1)
+            {
+                await fireShotHandler.HandleAsync(
+                    new FireShotCommand("12345678", "guest-1", guestSafeCells[i]));
+            }
+        }
+
+        var game = await repository.GetByCodeAsync("12345678");
+
+        Assert.NotNull(game);
+        Assert.Equal(GamePhase.Finished, game.Phase);
+        Assert.Equal("host-1", game.WinnerPlayerId);
+        Assert.Null(game.CurrentTurnPlayerId);
+        Assert.Contains(capturedBus.PublishedEvents,
+            static e => e is GameFinishedIntegrationEvent finished && finished.WinnerPlayerId == "host-1");
+    }
+
+    [Fact]
+    public async Task FireShotWinConditionSurvivesRepositoryRoundTrip()
+    {
+        // This test specifically validates the rehydration bug fix:
+        // hit state must be restored from IncomingShots when loading from the repository.
+        var repository = new InMemoryGameRepository();
+        await CreateReadyToPlayGameAsync(repository, hostGoesFirst: true);
+        var fireShotHandler = new FireShotHandler(repository, new NullEventBus());
+
+        // Sink the destroyer (len 2) at (0,8) and (1,8) with a guest turn in between.
+        // If rehydration is broken, the second hit would not see the first hit and IsSunk stays false.
+        await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "host-1", new GameCoordinate(0, 8)));
+        await fireShotHandler.HandleAsync(new FireShotCommand("12345678", "guest-1", new GameCoordinate(9, 9)));
+
+        var stateAfterSecondHit = await fireShotHandler.HandleAsync(
+            new FireShotCommand("12345678", "host-1", new GameCoordinate(1, 8)));
+
+        // The destroyer should report Sunk (outcome 2), not just Hit (outcome 1)
+        var destroyerShot = stateAfterSecondHit.OpponentBoard.KnownShots
+            .Single(s => s.Coordinate.Row == 1 && s.Coordinate.Column == 8);
+        Assert.Equal(HexMaster.BattleShip.Games.Abstractions.Models.ShotOutcome.Sunk, destroyerShot.Outcome);
+    }
+
+
+    [Fact]
     public async Task AbandonGameEndsJoinedGameWithoutWinner()
     {
         var repository = new InMemoryGameRepository();
