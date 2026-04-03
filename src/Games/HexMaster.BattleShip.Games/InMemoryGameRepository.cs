@@ -9,6 +9,16 @@ public sealed class InMemoryGameRepository : IGameRepository
 {
     private readonly ConcurrentDictionary<string, Persistence.GameDocument> games = new(StringComparer.Ordinal);
 
+    // Per-game semaphores to serialize the entire read-modify-save cycle and prevent lost updates.
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> perGameLocks = new(StringComparer.Ordinal);
+
+    public async Task<IAsyncDisposable> BeginUpdateAsync(string gameCode, CancellationToken cancellationToken = default)
+    {
+        var semaphore = perGameLocks.GetOrAdd(gameCode, _ => new SemaphoreSlim(1, 1));
+        await semaphore.WaitAsync(cancellationToken);
+        return new SemaphoreReleaser(semaphore);
+    }
+
     public Task SaveAsync(IGame game, CancellationToken cancellationToken = default)
     {
         if (game is not Game concreteGame)
@@ -32,5 +42,14 @@ public sealed class InMemoryGameRepository : IGameRepository
             games.TryGetValue(gameCode, out var document)
                 ? Game.Rehydrate(document)
                 : null);
+    }
+
+    private sealed class SemaphoreReleaser(SemaphoreSlim semaphore) : IAsyncDisposable
+    {
+        public ValueTask DisposeAsync()
+        {
+            semaphore.Release();
+            return ValueTask.CompletedTask;
+        }
     }
 }
