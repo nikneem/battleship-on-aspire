@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, debounceTime, distinctUntilChanged, map, of, startWith, switchMap } from 'rxjs';
@@ -35,7 +35,7 @@ export class JoinGamePage {
     }),
     gameCode: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required]
+      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(8)]
     }),
     joinSecret: new FormControl('', {
       nonNullable: true
@@ -46,11 +46,19 @@ export class JoinGamePage {
   readonly profileStatus = signal<ProfileStatus>('idle');
   readonly joinError = signal<string | null>(null);
   readonly joinPending = signal(false);
+
+  // Convert gameCode valueChanges to a signal so canJoinGame re-evaluates reactively
+  // when either the profile status OR the game code changes (in any order).
+  private readonly gameCodeValue = toSignal(
+    this.form.controls.gameCode.valueChanges.pipe(startWith('')),
+    { initialValue: '' }
+  );
+
   readonly canJoinGame = computed(
     () =>
       this.profileStatus() === 'ready' &&
       !this.joinPending() &&
-      this.form.controls.gameCode.value.trim() !== ''
+      this.gameCodeValue().trim().length === 8
   );
 
   constructor() {

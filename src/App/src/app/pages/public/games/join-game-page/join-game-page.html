@@ -41,8 +41,8 @@
       }
     </section>
 
-    <button class="command-link" type="submit" [disabled]="!canJoinGame()">
-      JOIN GAME
+    <button class="command-link command-link--launch" type="submit" [disabled]="!canJoinGame()">
+      <span class="launch-text">{{ joinPending() ? 'JOINING...' : 'JOIN GAME' }}</span>
     </button>
   </form>
 </main>
