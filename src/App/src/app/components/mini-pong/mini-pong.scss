@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  line-height: 0;
+}
+
+.pong-canvas {
+  display: block;
+  cursor: none;
+  max-width: 100%;
+  touch-action: none;
+  border: 1px solid var(--battle-ops-border-color);
+}
