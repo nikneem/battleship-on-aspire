@@ -1,0 +1,226 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Required for OIDC Azure login
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  NODE_VERSION: '24.x'
+  SOLUTION_PATH: 'src/Battleship.slnx'
+  API_PROJECT_PATH: 'src/HexMaster.BattleShip.Api/HexMaster.BattleShip.Api.csproj'
+  APP_LOCATION: 'src/App'
+  API_IMAGE_NAME: 'battleship-api'
+  FRONTEND_IMAGE_NAME: 'battleship-frontend'
+
+jobs:
+  # ── 1. Semantic version ──────────────────────────────────────────────────────
+  version:
+    name: Calculate Version
+    runs-on: ubuntu-latest
+    outputs:
+      semVer: ${{ steps.gitversion.outputs.semVer }}
+      assemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}
+      informationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for GitVersion
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v4.2.0
+        with:
+          versionSpec: '6.4.x'
+
+      - name: Execute GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v4.2.0
+
+      - name: Display version
+        run: |
+          echo "SemVer:              ${{ steps.gitversion.outputs.semVer }}"
+          echo "FullSemVer:          ${{ steps.gitversion.outputs.fullSemVer }}"
+          echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+
+  # ── 2. Build and test .NET ───────────────────────────────────────────────────
+  dotnet-build-test:
+    name: .NET — Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: |
+          dotnet build ${{ env.SOLUTION_PATH }} \
+            --configuration Release \
+            --no-restore
+
+      - name: Test
+        run: |
+          dotnet test ${{ env.SOLUTION_PATH }} \
+            --configuration Release \
+            --no-build \
+            --verbosity normal
+
+  # ── 3a. Publish API container ────────────────────────────────────────────────
+  publish-api:
+    name: Publish API Container
+    runs-on: ubuntu-latest
+    needs: [version, dotnet-build-test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name ${{ secrets.CONTAINER_REGISTRY_NAME }}
+
+      - name: Publish API container to ACR
+        run: |
+          dotnet publish ${{ env.API_PROJECT_PATH }} \
+            --configuration Release \
+            --os linux \
+            --arch x64 \
+            /t:PublishContainer \
+            /p:ContainerRegistry=${{ secrets.CONTAINER_REGISTRY_SERVER }} \
+            /p:ContainerImageName=${{ env.API_IMAGE_NAME }} \
+            /p:ContainerImageTag=${{ needs.version.outputs.semVer }} \
+            /p:Version=${{ needs.version.outputs.assemblySemVer }} \
+            /p:AssemblyVersion=${{ needs.version.outputs.assemblySemVer }} \
+            /p:InformationalVersion=${{ needs.version.outputs.informationalVersion }}
+
+      - name: Summarize
+        run: |
+          echo "### API Container Published :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Registry | ${{ secrets.CONTAINER_REGISTRY_SERVER }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | ${{ env.API_IMAGE_NAME }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | ${{ needs.version.outputs.semVer }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.version.outputs.informationalVersion }} |" >> $GITHUB_STEP_SUMMARY
+
+  # ── 3b. Publish frontend container ──────────────────────────────────────────
+  publish-frontend:
+    name: Publish Frontend Container
+    runs-on: ubuntu-latest
+    needs: [version, dotnet-build-test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name ${{ secrets.CONTAINER_REGISTRY_NAME }}
+
+      - name: Build and push frontend container
+        run: |
+          docker build \
+            --build-arg APP_VERSION=${{ needs.version.outputs.semVer }} \
+            --label org.opencontainers.image.version=${{ needs.version.outputs.semVer }} \
+            --label org.opencontainers.image.revision=${{ github.sha }} \
+            -t ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }} \
+            -t ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:latest \
+            ${{ env.APP_LOCATION }}
+          docker push ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}
+          docker push ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
+
+      - name: Summarize
+        run: |
+          echo "### Frontend Container Published :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Registry | ${{ secrets.CONTAINER_REGISTRY_SERVER }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | ${{ env.FRONTEND_IMAGE_NAME }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | ${{ needs.version.outputs.semVer }} |" >> $GITHUB_STEP_SUMMARY
+
+  # ── 4. Deploy infrastructure + update container apps ────────────────────────
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: [version, publish-api, publish-frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy infrastructure and container apps
+        run: |
+          az deployment group create \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --template-file infra/main.bicep \
+            --parameters infra/main.bicepparam \
+            --parameters jwtSigningKey="${{ secrets.JWT_SIGNING_KEY }}" \
+            --parameters apiImage="${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.API_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}" \
+            --parameters frontendImage="${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}"
+
+      - name: Read deployment outputs
+        id: outputs
+        run: |
+          OUTPUTS=$(az deployment group show \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --name main \
+            --query properties.outputs \
+            --output json)
+
+          API_URL=$(echo "$OUTPUTS" | jq -r '.apiUrl.value // "unknown"')
+          FRONTEND_URL=$(echo "$OUTPUTS" | jq -r '.frontendUrl.value // "unknown"')
+
+          echo "apiUrl=$API_URL" >> $GITHUB_OUTPUT
+          echo "frontendUrl=$FRONTEND_URL" >> $GITHUB_OUTPUT
+
+      - name: Summarize deployment
+        run: |
+          echo "### Deployment Complete :cloud:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.version.outputs.semVer }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API URL | ${{ steps.outputs.outputs.apiUrl }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend URL | ${{ steps.outputs.outputs.frontendUrl }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
