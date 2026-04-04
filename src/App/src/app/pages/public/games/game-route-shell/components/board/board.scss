@@ -77,16 +77,17 @@
 }
 
 .shot-marker {
-  font-size: 0.9rem;
+  font-size: 1.6rem;
   line-height: 1;
 }
 
 .shot-marker--miss {
-  color: rgb(0 229 255 / 0.65);
-  font-size: 0.55rem;
+  color: rgb(0 229 255 / 0.85);
+  font-size: 1.3rem;
 }
 
 .shot-marker--hit {
   color: var(--battle-ops-damage-red);
+  font-size: 1.6rem;
   font-weight: 700;
 }
