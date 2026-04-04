@@ -65,6 +65,16 @@
   cursor: crosshair;
 }
 
+.combat-board__cell.is-miss {
+  background: rgb(0 229 255 / 0.08);
+  border-color: rgb(0 229 255 / 0.35);
+}
+
+.combat-board__cell.is-hit {
+  background: rgb(255 40 60 / 0.15);
+  border-color: rgb(255 40 60 / 0.5);
+}
+
 .combat-board__cell.is-ship {
   background: rgb(0 229 255 / 0.16);
   border-color: rgb(0 229 255 / 0.4);
