@@ -4,10 +4,19 @@ param workloadName = 'battleship'
 param env = 'dev'
 
 // apiImage and frontendImage default to the hello-world placeholder.
-// After pushing images to ACR, override with e.g.:
-//   param apiImage = 'crname.azurecr.io/battleship-api:latest'
-//   param frontendImage = 'crname.azurecr.io/battleship-frontend:latest'
+// Override after pushing images, e.g.:
+//   --parameters apiImage='myregistry.azurecr.io/battleship-api:1.0.0'
+//   --parameters frontendImage='myregistry.azurecr.io/battleship-frontend:1.0.0'
 
-// jwtSigningKey MUST be supplied at deployment time. Do not commit a real value here.
-// Example: az deployment group create ... --parameters jwtSigningKey=<secret>
+// Registry credentials and jwtSigningKey MUST be supplied at deployment time.
+// Do not commit real values here.
+// Example:
+//   az deployment group create ... \
+//     --parameters containerRegistryServer=myregistry.azurecr.io \
+//     --parameters containerRegistryUsername=myuser \
+//     --parameters containerRegistryPassword=<secret> \
+//     --parameters jwtSigningKey=<secret>
+param containerRegistryServer = ''
+param containerRegistryUsername = ''
+param containerRegistryPassword = ''
 param jwtSigningKey = ''
