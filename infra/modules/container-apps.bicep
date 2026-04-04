@@ -1,8 +1,14 @@
 param location string
 param environmentId string
-param containerRegistryLoginServer string
+param containerRegistryServer string
 param managedIdentityId string
 param managedIdentityClientId string
+
+@secure()
+param containerRegistryUsername string
+
+@secure()
+param containerRegistryPassword string
 
 @description('Full container image reference for the API. Defaults to a hello-world placeholder for initial infra deployment.')
 param apiImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
@@ -45,11 +51,16 @@ resource apiContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
       registries: [
         {
-          server: containerRegistryLoginServer
-          identity: managedIdentityId
+          server: containerRegistryServer
+          username: containerRegistryUsername
+          passwordSecretRef: 'registry-password'
         }
       ]
       secrets: [
+        {
+          name: 'registry-password'
+          value: containerRegistryPassword
+        }
         {
           name: 'jwt-signing-key'
           value: jwtSigningKey
@@ -104,8 +115,15 @@ resource frontendContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
       registries: [
         {
-          server: containerRegistryLoginServer
-          identity: managedIdentityId
+          server: containerRegistryServer
+          username: containerRegistryUsername
+          passwordSecretRef: 'registry-password'
+        }
+      ]
+      secrets: [
+        {
+          name: 'registry-password'
+          value: containerRegistryPassword
         }
       ]
     }
