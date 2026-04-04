@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
 import { CreateGamePage } from './create-game-page';
+import { authInterceptor } from '../../../../auth.interceptor';
 
 describe('CreateGamePage', () => {
   beforeEach(() => {
@@ -13,7 +14,7 @@ describe('CreateGamePage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CreateGamePage],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()]
+      providers: [provideRouter([]), provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting()]
     }).compileComponents();
   });
 

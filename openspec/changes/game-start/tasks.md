@@ -39,5 +39,5 @@
 
 ## 6. Validation
 
-- [ ] 6.1 Run `dotnet test .\src\Battleship.slnx --nologo` and confirm all existing tests pass plus new tests added in tasks 1.5, 3.4, and 5.5
-- [ ] 6.2 Run `npm run build` and `npm run test -- --watch=false` from `src\App` to confirm no frontend regressions
+- [x] 6.1 Run `dotnet test .\src\Battleship.slnx --nologo` and confirm all existing tests pass plus new tests added in tasks 1.5, 3.4, and 5.5
+- [x] 6.2 Run `npm run build` and `npm run test -- --watch=false` from `src\App` to confirm no frontend regressions

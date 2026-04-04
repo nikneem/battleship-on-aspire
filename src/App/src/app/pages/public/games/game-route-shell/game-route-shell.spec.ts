@@ -32,7 +32,9 @@ function makeSignalRStub() {
     gameFinished$: new Subject(),
     gameAbandoned$: new Subject(),
     opponentConnectionLost$: new Subject(),
-    fleetLocked$: new Subject()
+    fleetLocked$: new Subject(),
+    playerJoined$: new Subject(),
+    playerReady$: new Subject()
   };
 }
 
