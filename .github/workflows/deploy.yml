@@ -95,24 +95,20 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Log in to container registry
+        run: |
+          echo "${{ secrets.CONTAINER_REGISTRY_PASSWORD }}" | \
+            docker login ${{ secrets.CONTAINER_REGISTRY_HOST }} \
+              -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
 
-      - name: Log in to Azure Container Registry
-        run: az acr login --name ${{ secrets.CONTAINER_REGISTRY_NAME }}
-
-      - name: Publish API container to ACR
+      - name: Publish API container
         run: |
           dotnet publish ${{ env.API_PROJECT_PATH }} \
             --configuration Release \
             --os linux \
             --arch x64 \
             /t:PublishContainer \
-            /p:ContainerRegistry=${{ secrets.CONTAINER_REGISTRY_SERVER }} \
+            /p:ContainerRegistry=${{ secrets.CONTAINER_REGISTRY_HOST }} \
             /p:ContainerImageName=${{ env.API_IMAGE_NAME }} \
             /p:ContainerImageTag=${{ needs.version.outputs.semVer }} \
             /p:Version=${{ needs.version.outputs.assemblySemVer }} \
@@ -125,7 +121,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Registry | ${{ secrets.CONTAINER_REGISTRY_SERVER }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Registry | ${{ secrets.CONTAINER_REGISTRY_HOST }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Image | ${{ env.API_IMAGE_NAME }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Tag | ${{ needs.version.outputs.semVer }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Version | ${{ needs.version.outputs.informationalVersion }} |" >> $GITHUB_STEP_SUMMARY
@@ -140,15 +136,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Log in to Azure Container Registry
-        run: az acr login --name ${{ secrets.CONTAINER_REGISTRY_NAME }}
+      - name: Log in to container registry
+        run: |
+          echo "${{ secrets.CONTAINER_REGISTRY_PASSWORD }}" | \
+            docker login ${{ secrets.CONTAINER_REGISTRY_HOST }} \
+              -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
 
       - name: Build and push frontend container
         run: |
@@ -156,11 +148,11 @@ jobs:
             --build-arg APP_VERSION=${{ needs.version.outputs.semVer }} \
             --label org.opencontainers.image.version=${{ needs.version.outputs.semVer }} \
             --label org.opencontainers.image.revision=${{ github.sha }} \
-            -t ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }} \
-            -t ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:latest \
+            -t ${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }} \
+            -t ${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:latest \
             ${{ env.APP_LOCATION }}
-          docker push ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}
-          docker push ${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
+          docker push ${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}
+          docker push ${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
 
       - name: Summarize
         run: |
@@ -168,7 +160,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Registry | ${{ secrets.CONTAINER_REGISTRY_SERVER }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Registry | ${{ secrets.CONTAINER_REGISTRY_HOST }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Image | ${{ env.FRONTEND_IMAGE_NAME }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Tag | ${{ needs.version.outputs.semVer }} |" >> $GITHUB_STEP_SUMMARY
 
@@ -196,8 +188,11 @@ jobs:
             --template-file infra/main.bicep \
             --parameters infra/main.bicepparam \
             --parameters jwtSigningKey="${{ secrets.JWT_SIGNING_KEY }}" \
-            --parameters apiImage="${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.API_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}" \
-            --parameters frontendImage="${{ secrets.CONTAINER_REGISTRY_SERVER }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}"
+            --parameters containerRegistryServer="${{ secrets.CONTAINER_REGISTRY_HOST }}" \
+            --parameters containerRegistryUsername="${{ secrets.CONTAINER_REGISTRY_USERNAME }}" \
+            --parameters containerRegistryPassword="${{ secrets.CONTAINER_REGISTRY_PASSWORD }}" \
+            --parameters apiImage="${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.API_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}" \
+            --parameters frontendImage="${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}"
 
       - name: Read deployment outputs
         id: outputs
