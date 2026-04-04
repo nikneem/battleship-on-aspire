@@ -84,10 +84,12 @@
 .shot-marker--miss {
   color: rgb(0 229 255 / 0.85);
   font-size: 1.3rem;
+  text-shadow: 0 0 8px rgb(0 229 255 / 0.7);
 }
 
 .shot-marker--hit {
   color: var(--battle-ops-damage-red);
   font-size: 1.6rem;
   font-weight: 700;
+  text-shadow: 0 0 10px rgb(255 40 60 / 0.8);
 }
