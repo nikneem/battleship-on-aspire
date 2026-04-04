@@ -22,15 +22,22 @@ param frontendImage string = 'mcr.microsoft.com/azuredocs/containerapps-hellowor
 @minLength(32)
 param jwtSigningKey string
 
+@description('Container registry server hostname (e.g. myregistry.azurecr.io).')
+param containerRegistryServer string
+
+@description('Container registry username.')
+param containerRegistryUsername string
+
+@description('Container registry password.')
+@secure()
+param containerRegistryPassword string
+
 // ── Naming helpers ─────────────────────────────────────────────────────────────
 var suffix = '${workloadName}-${env}'
 var uniqueSuffix = uniqueString(resourceGroup().id)
 
 // Storage account: 3–24 lowercase alphanumeric characters
 var storageAccountName = toLower(take('st${replace(suffix, '-', '')}${uniqueSuffix}', 24))
-
-// ACR: 5–50 alphanumeric characters
-var acrName = take('cr${replace(suffix, '-', '')}${uniqueSuffix}', 50)
 
 // Service Bus namespace: 6–50 characters
 var serviceBusName = 'sbns-${suffix}-${take(uniqueSuffix, 6)}'
@@ -50,15 +57,6 @@ module logAnalytics 'modules/log-analytics.bicep' = {
   params: {
     name: 'log-${suffix}'
     location: location
-  }
-}
-
-module containerRegistry 'modules/container-registry.bicep' = {
-  name: 'container-registry'
-  params: {
-    name: acrName
-    location: location
-    managedIdentityPrincipalId: managedIdentity.outputs.principalId
   }
 }
 
@@ -98,7 +96,9 @@ module containerApps 'modules/container-apps.bicep' = {
   params: {
     location: location
     environmentId: containerAppsEnv.outputs.id
-    containerRegistryLoginServer: containerRegistry.outputs.loginServer
+    containerRegistryServer: containerRegistryServer
+    containerRegistryUsername: containerRegistryUsername
+    containerRegistryPassword: containerRegistryPassword
     managedIdentityId: managedIdentity.outputs.id
     managedIdentityClientId: managedIdentity.outputs.clientId
     apiImage: apiImage
@@ -108,12 +108,6 @@ module containerApps 'modules/container-apps.bicep' = {
 }
 
 // ── Outputs ────────────────────────────────────────────────────────────────────
-
-@description('Azure Container Registry name — use this when tagging and pushing images.')
-output containerRegistryName string = containerRegistry.outputs.name
-
-@description('ACR login server hostname.')
-output containerRegistryLoginServer string = containerRegistry.outputs.loginServer
 
 @description('Public URL of the battleship API.')
 output apiUrl string = containerApps.outputs.apiUrl
