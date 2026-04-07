@@ -29,6 +29,7 @@ param jwtSigningKey string
 param containerRegistryServer string
 
 @description('Container registry username.')
+@secure()
 param containerRegistryUsername string
 
 @description('Container registry password.')
