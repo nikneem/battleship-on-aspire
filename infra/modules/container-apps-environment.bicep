@@ -55,3 +55,19 @@ resource pubsubDaprComponent 'Microsoft.App/managedEnvironments/daprComponents@2
 output id string = containerAppsEnv.id
 output name string = containerAppsEnv.name
 output defaultDomain string = containerAppsEnv.properties.defaultDomain
+
+// ── Managed certificate ────────────────────────────────────────────────────────
+// Prerequisite: add a CNAME record for battleship.hexmaster.nl pointing to
+// the environment's defaultDomain before deploying, so Azure can validate ownership.
+
+resource managedCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2024-03-01' = {
+  parent: containerAppsEnv
+  name: 'cert-battleship-hexmaster-nl'
+  location: location
+  properties: {
+    subjectName: 'battleship.hexmaster.nl'
+    domainControlValidation: 'CNAME'
+  }
+}
+
+output managedCertificateId string = managedCertificate.id

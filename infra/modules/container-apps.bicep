@@ -3,6 +3,7 @@ param environmentId string
 param containerRegistryServer string
 param managedIdentityId string
 param managedIdentityClientId string
+param managedCertificateId string
 
 @secure()
 param containerRegistryUsername string
@@ -112,6 +113,13 @@ resource frontendContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
         external: true
         targetPort: 80
         transport: 'auto'
+        customDomains: [
+          {
+            name: 'battleship.hexmaster.nl'
+            certificateId: managedCertificateId
+            bindingType: 'SniEnabled'
+          }
+        ]
       }
       registries: [
         {

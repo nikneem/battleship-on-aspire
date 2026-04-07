@@ -117,6 +117,7 @@ module containerApps 'modules/container-apps.bicep' = {
     containerRegistryPassword: containerRegistryPassword
     managedIdentityId: managedIdentity.outputs.id
     managedIdentityClientId: managedIdentity.outputs.clientId
+    managedCertificateId: containerAppsEnv.outputs.managedCertificateId
     apiImage: apiImage
     frontendImage: frontendImage
     jwtSigningKey: jwtSigningKey
