@@ -38,7 +38,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
         // 'auto' supports both HTTP/1.1 and HTTP/2 — required for SignalR WebSockets
         transport: 'auto'
         corsPolicy: {
-          allowedOrigins: ['*']
+          allowedOrigins: ['https://battleship.hexmaster.nl']
           allowedHeaders: ['*']
           allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
           allowCredentials: true

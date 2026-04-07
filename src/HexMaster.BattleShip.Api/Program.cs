@@ -68,6 +68,28 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+        options.AddDefaultPolicy(policy => policy
+            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()));
+}
+else
+{
+    var allowedOrigins = builder.Configuration
+        .GetSection("Cors:AllowedOrigins")
+        .Get<string[]>() ?? [];
+    builder.Services.AddCors(options =>
+        options.AddDefaultPolicy(policy => policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()));
+}
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -80,6 +102,7 @@ if (app.Environment.IsDevelopment())
 app.UseCloudEvents();
 // Needs to be disabled for Dapr
 // app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
