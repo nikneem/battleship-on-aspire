@@ -16,7 +16,7 @@ env:
   SOLUTION_PATH: 'src/Battleship.slnx'
   API_PROJECT_PATH: 'src/HexMaster.BattleShip.Api/HexMaster.BattleShip.Api.csproj'
   APP_LOCATION: 'src/App'
-  API_IMAGE_NAME: 'battleship-api'
+  API_IMAGE_NAME: 'battleship/battleship-backend-api'
   FRONTEND_IMAGE_NAME: 'battleship-frontend'
 
 jobs:

@@ -6,6 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <ContainerRegistry>nvv54gsk4pteu.azurecr.io</ContainerRegistry>
+    <ContainerImageName>battleship/battleship-backend-api</ContainerImageName>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
