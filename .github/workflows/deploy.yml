@@ -183,8 +183,8 @@ jobs:
 
       - name: Deploy infrastructure and container apps
         run: |
-          az deployment group create \
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+          az deployment sub create \
+            --location northeurope \
             --template-file infra/main.bicep \
             --parameters infra/main.bicepparam \
             --parameters jwtSigningKey="${{ secrets.JWT_SIGNING_KEY }}" \
@@ -197,8 +197,7 @@ jobs:
       - name: Read deployment outputs
         id: outputs
         run: |
-          OUTPUTS=$(az deployment group show \
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+          OUTPUTS=$(az deployment sub show \
             --name main \
             --query properties.outputs \
             --output json)
