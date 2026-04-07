@@ -9,6 +9,7 @@
   <PropertyGroup>
     <ContainerRegistry>nvv54gsk4pteu.azurecr.io</ContainerRegistry>
     <ContainerImageName>battleship/battleship-backend-api</ContainerImageName>
+    <ContainerUser>app</ContainerUser>
   </PropertyGroup>
 
   <ItemGroup>
