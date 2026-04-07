@@ -181,18 +181,46 @@ jobs:
           tenant-id: ${{ secrets.PROD_TENANT_ID }}
           subscription-id: ${{ secrets.PROD_SUBSCRIPTION_ID }}
 
+      - name: Generate deployment parameter file
+        env:
+          REGISTRY_SERVER: ${{ secrets.CONTAINER_REGISTRY_HOST }}
+          REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+          JWT_SIGNING_KEY: ${{ secrets.JWT_SIGNING_KEY }}
+          API_IMAGE: ${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.API_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}
+          FRONTEND_IMAGE: ${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}
+        run: |
+          python3 - << 'EOF'
+          import os
+
+          def bstr(v):
+              return "'" + str(v).replace("'", "''") + "'"
+
+          lines = [
+              "using './main.bicep'",
+              "",
+              "param workloadName = 'battleship'",
+              "param env = 'prd'",
+              "param location = 'northeurope'",
+              "param resourceGroupName = 'rg-battleship-prd'",
+              f"param apiImage = {bstr(os.environ['API_IMAGE'])}",
+              f"param frontendImage = {bstr(os.environ['FRONTEND_IMAGE'])}",
+              f"param containerRegistryServer = {bstr(os.environ['REGISTRY_SERVER'])}",
+              f"param containerRegistryUsername = {bstr(os.environ['REGISTRY_USERNAME'])}",
+              f"param containerRegistryPassword = {bstr(os.environ['REGISTRY_PASSWORD'])}",
+              f"param jwtSigningKey = {bstr(os.environ['JWT_SIGNING_KEY'])}",
+          ]
+
+          with open('infra/main.bicepparam', 'w') as f:
+              f.write('\n'.join(lines) + '\n')
+          EOF
+
       - name: Deploy infrastructure and container apps
         run: |
           az deployment sub create \
             --location northeurope \
             --template-file infra/main.bicep \
-            --parameters infra/main.bicepparam \
-            --parameters jwtSigningKey="${{ secrets.JWT_SIGNING_KEY }}" \
-            --parameters containerRegistryServer="${{ secrets.CONTAINER_REGISTRY_HOST }}" \
-            --parameters containerRegistryUsername="${{ secrets.CONTAINER_REGISTRY_USERNAME }}" \
-            --parameters containerRegistryPassword="${{ secrets.CONTAINER_REGISTRY_PASSWORD }}" \
-            --parameters apiImage="${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.API_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}" \
-            --parameters frontendImage="${{ secrets.CONTAINER_REGISTRY_HOST }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.version.outputs.semVer }}"
+            --parameters infra/main.bicepparam
 
       - name: Read deployment outputs
         id: outputs

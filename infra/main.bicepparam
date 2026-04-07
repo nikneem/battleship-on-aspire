@@ -5,11 +5,12 @@ param env = 'prd'
 param location = 'northeurope'
 param resourceGroupName = 'rg-battleship-prd'
 
-// apiImage and frontendImage default to the hello-world placeholder.
-// Override after pushing images, e.g.:
-//   --parameters apiImage='myregistry.azurecr.io/battleship/battleship-backend-api:1.0.0'
-//   --parameters frontendImage='myregistry.azurecr.io/battleship-frontend:1.0.0'
+// Image references — overridden at deployment time with the versioned image tag.
+param apiImage = ''
+param frontendImage = ''
 
-// containerRegistryServer, containerRegistryUsername, containerRegistryPassword,
-// and jwtSigningKey MUST be supplied at deployment time via --parameters.
-// Do not commit real values here.
+// Supplied at deployment time via GitHub Actions secrets. Do not commit real values.
+param containerRegistryServer = ''
+param containerRegistryUsername = ''
+param containerRegistryPassword = ''
+param jwtSigningKey = ''
