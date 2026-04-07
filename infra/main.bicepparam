@@ -10,9 +10,6 @@ param resourceGroupName = 'rg-battleship-prd'
 //   --parameters apiImage='myregistry.azurecr.io/battleship/battleship-backend-api:1.0.0'
 //   --parameters frontendImage='myregistry.azurecr.io/battleship-frontend:1.0.0'
 
-// Registry credentials and jwtSigningKey MUST be supplied at deployment time.
+// containerRegistryServer, containerRegistryUsername, containerRegistryPassword,
+// and jwtSigningKey MUST be supplied at deployment time via --parameters.
 // Do not commit real values here.
-param containerRegistryServer = ''
-param containerRegistryUsername = ''
-param containerRegistryPassword = ''
-param jwtSigningKey = ''
