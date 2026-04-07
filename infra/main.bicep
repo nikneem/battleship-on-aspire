@@ -20,21 +20,20 @@ param apiImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:la
 @description('Full container image reference for the frontend. Defaults to a hello-world placeholder for initial infrastructure deployment.')
 param frontendImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 
-@description('JWT signing key for anonymous player session tokens (minimum 32 characters).')
+@description('JWT signing key for anonymous player session tokens (minimum 32 characters, supplied at deployment time).')
 @secure()
-@minLength(32)
-param jwtSigningKey string
+param jwtSigningKey string = ''
 
 @description('Container registry server hostname (e.g. myregistry.azurecr.io).')
-param containerRegistryServer string
+param containerRegistryServer string = ''
 
 @description('Container registry username.')
 @secure()
-param containerRegistryUsername string
+param containerRegistryUsername string = ''
 
 @description('Container registry password.')
 @secure()
-param containerRegistryPassword string
+param containerRegistryPassword string = ''
 
 // ── Resource group ─────────────────────────────────────────────────────────────
 
