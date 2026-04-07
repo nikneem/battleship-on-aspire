@@ -235,6 +235,10 @@ Prefer repository skills when applicable:
 - `openspec-archive-change` for archiving completed changes
 - `openspec-sync-github-issues` for issue/spec synchronization workflows
 
+## Commit discipline
+
+When implementing changes, commit frequently — after each meaningful unit of work (e.g., completing a task, adding a handler, wiring a module, or finishing a frontend feature). Do not batch all changes into a single commit at the end.
+
 ## Testing and validation commands
 
 Use existing commands; do not invent new validation tooling.
