@@ -75,6 +75,17 @@
   border-color: rgb(255 40 60 / 0.5);
 }
 
+/* Defend mode: blue markers for opponent shots */
+.combat-board[data-mode='defend'] .combat-board__cell.is-miss {
+  background: rgb(0 100 200 / 0.12);
+  border-color: rgb(0 100 200 / 0.4);
+}
+
+.combat-board[data-mode='defend'] .combat-board__cell.is-hit {
+  background: rgb(0 100 200 / 0.2);
+  border-color: rgb(0 100 200 / 0.5);
+}
+
 .combat-board__cell.is-ship {
   background: rgb(0 229 255 / 0.16);
   border-color: rgb(0 229 255 / 0.4);
@@ -102,4 +113,15 @@
   font-size: 1.6rem;
   font-weight: 700;
   text-shadow: 0 0 10px rgb(255 40 60 / 0.8);
+}
+
+/* Defend mode: blue shot markers */
+.combat-board[data-mode='defend'] .shot-marker--miss {
+  color: rgb(60 130 255 / 0.85);
+  text-shadow: 0 0 8px rgb(60 130 255 / 0.7);
+}
+
+.combat-board[data-mode='defend'] .shot-marker--hit {
+  color: rgb(60 130 255);
+  text-shadow: 0 0 10px rgb(60 130 255 / 0.8);
 }

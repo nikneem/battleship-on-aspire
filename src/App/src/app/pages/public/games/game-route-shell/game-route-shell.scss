@@ -338,6 +338,16 @@
 .command-link--attention {
   border-color: var(--battle-ops-amber);
   box-shadow: 0 0 20px rgb(255 179 0 / 0.16);
+  animation: ready-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes ready-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgb(255 179 0 / 0.16);
+  }
+  50% {
+    box-shadow: 0 0 36px rgb(255 179 0 / 0.4), 0 0 8px rgb(255 179 0 / 0.25) inset;
+  }
 }
 
 .ship-card.is-placed {
