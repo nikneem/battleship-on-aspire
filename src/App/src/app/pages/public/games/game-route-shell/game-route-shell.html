@@ -293,3 +293,7 @@
   <bat-waiting-for-opponent [gameCode]="gameCode" />
 }
 
+@if (opponentDisconnected()) {
+  <bat-connection-lost-overlay (timedOut)="onConnectionTimeout()" />
+}
+

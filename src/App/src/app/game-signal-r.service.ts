@@ -18,6 +18,7 @@ export class GameSignalRService implements OnDestroy {
   readonly gameFinished$ = new Subject<string>();        // winnerPlayerId
   readonly gameAbandoned$ = new Subject<string>();       // abandoningPlayerId
   readonly opponentConnectionLost$ = new Subject<string>(); // playerId
+  readonly opponentReconnected$ = new Subject<string>();    // playerId
   readonly fleetLocked$ = new Subject<string>();         // playerId
   readonly playerReady$ = new Subject<string>();         // playerId
   readonly playerJoined$ = new Subject<string>();        // guestPlayerId
@@ -45,6 +46,9 @@ export class GameSignalRService implements OnDestroy {
     this.connection.on('OpponentConnectionLost', (pid: string) =>
       this.opponentConnectionLost$.next(pid)
     );
+    this.connection.on('OpponentReconnected', (pid: string) =>
+      this.opponentReconnected$.next(pid)
+    );
     this.connection.on('FleetLocked', (pid: string) =>
       this.fleetLocked$.next(pid)
     );
@@ -54,6 +58,11 @@ export class GameSignalRService implements OnDestroy {
     this.connection.on('PlayerJoined', (guestPlayerId: string) =>
       this.playerJoined$.next(guestPlayerId)
     );
+
+    this.connection.onreconnected(() => {
+      this.connection!.invoke('JoinGame', gameCode, playerId)
+        .catch((err) => console.error('Re-join after reconnect failed:', err));
+    });
 
     this.connection
       .start()
