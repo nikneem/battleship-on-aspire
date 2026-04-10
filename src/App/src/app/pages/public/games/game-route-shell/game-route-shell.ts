@@ -207,6 +207,25 @@ export class GameRouteShell implements OnInit, OnDestroy {
     return 'Select a hull from the inventory or drag one straight onto the setup board.';
   });
 
+  // ── Combat statistics ────────────────────────────────────────────────────
+  protected readonly myStats = computed(() => {
+    const shots = this.opponentBoardState().knownShots;
+    const total = shots.length;
+    const hits = shots.filter(s => s.outcome > 0).length;
+    const misses = total - hits;
+    const ratio = total > 0 ? Math.round((hits / total) * 100) : 0;
+    return { total, hits, misses, ratio };
+  });
+
+  protected readonly opponentStats = computed(() => {
+    const shots = this.ownBoardState().incomingShots;
+    const total = shots.length;
+    const hits = shots.filter(s => s.outcome > 0).length;
+    const misses = total - hits;
+    const ratio = total > 0 ? Math.round((hits / total) * 100) : 0;
+    return { total, hits, misses, ratio };
+  });
+
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
     const session = this.identityService.session();

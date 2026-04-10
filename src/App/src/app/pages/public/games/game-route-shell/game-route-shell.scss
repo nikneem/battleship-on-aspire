@@ -505,3 +505,53 @@
   -webkit-text-fill-color: #4a0000;
 }
 
+/* ── Combat statistics ─────────────────────────────────────────────────────── */
+
+.combat-stats {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--battle-ops-border-color);
+}
+
+.combat-stats__player {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.combat-stats__label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--battle-ops-text-secondary);
+  text-transform: uppercase;
+}
+
+.combat-stats__values {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.combat-stats .stat {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--battle-ops-text-primary);
+}
+
+.combat-stats .stat--hit {
+  color: var(--battle-ops-amber);
+}
+
+.combat-stats .stat--miss {
+  color: var(--battle-ops-soft-aqua);
+}
+
+.combat-stats .stat--ratio {
+  color: var(--battle-ops-accent-color);
+  font-weight: 600;
+}
+
