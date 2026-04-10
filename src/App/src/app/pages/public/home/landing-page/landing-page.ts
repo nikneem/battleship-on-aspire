@@ -169,7 +169,8 @@ export class LandingPage {
   }
 
   private pushTerminalMessage(): void {
-    const nextMessage = terminalMessages[this.messageCursor % terminalMessages.length];
+    const randomIndex = Math.floor(Math.random() * terminalMessages.length);
+    const nextMessage = terminalMessages[randomIndex];
     this.messageCursor += 1;
 
     this.terminalFeed.update((feed) => [...feed.slice(-5), this.formatTerminalMessage(nextMessage)]);

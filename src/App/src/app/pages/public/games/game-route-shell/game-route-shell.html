@@ -37,6 +37,27 @@
           >
             <span class="launch-text">{{ firing() ? 'LAUNCHING...' : 'LAUNCH' }}</span>
           </button>
+
+          <div class="combat-stats">
+            <div class="combat-stats__player">
+              <span class="combat-stats__label">YOUR FIRE</span>
+              <span class="combat-stats__values">
+                <span class="stat" title="Total shots">{{ myStats().total }} SHOTS</span>
+                <span class="stat stat--hit" title="Hits">{{ myStats().hits }} HIT</span>
+                <span class="stat stat--miss" title="Misses">{{ myStats().misses }} MISS</span>
+                <span class="stat stat--ratio" title="Hit ratio">{{ myStats().ratio }}%</span>
+              </span>
+            </div>
+            <div class="combat-stats__player">
+              <span class="combat-stats__label">ENEMY FIRE</span>
+              <span class="combat-stats__values">
+                <span class="stat" title="Total shots">{{ opponentStats().total }} SHOTS</span>
+                <span class="stat stat--hit" title="Hits">{{ opponentStats().hits }} HIT</span>
+                <span class="stat stat--miss" title="Misses">{{ opponentStats().misses }} MISS</span>
+                <span class="stat stat--ratio" title="Hit ratio">{{ opponentStats().ratio }}%</span>
+              </span>
+            </div>
+          </div>
         }
       } @else if (waitingForOpponentReady()) {
         <p class="state-lock">READY SIGNAL SENT // AWAITING OPPOSING COMMANDER</p>
@@ -270,5 +291,9 @@
 
 @if (waitingForOpponent()) {
   <bat-waiting-for-opponent [gameCode]="gameCode" />
+}
+
+@if (opponentDisconnected()) {
+  <bat-connection-lost-overlay (timedOut)="onConnectionTimeout()" />
 }
 

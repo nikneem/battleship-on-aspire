@@ -1,0 +1,61 @@
+:host {
+  display: contents;
+}
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgb(5 7 10 / 0.88);
+  backdrop-filter: blur(4px);
+}
+
+.overlay-card {
+  max-width: 28rem;
+  padding: 2rem 2.5rem;
+  border: 1px solid var(--battle-ops-amber);
+  background: var(--battle-ops-panel-base);
+  text-align: center;
+}
+
+.overlay-title {
+  margin: 0.5rem 0;
+  font-size: 1.25rem;
+  color: var(--battle-ops-amber);
+  letter-spacing: 0.12em;
+}
+
+.overlay-desc {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--battle-ops-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.countdown__value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--battle-ops-amber);
+  text-shadow: 0 0 20px rgb(255 179 0 / 0.5);
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.countdown__label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--battle-ops-text-secondary);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; text-shadow: 0 0 20px rgb(255 179 0 / 0.5); }
+  50% { opacity: 0.7; text-shadow: 0 0 40px rgb(255 179 0 / 0.8); }
+}

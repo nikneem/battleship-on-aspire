@@ -24,6 +24,7 @@ import {
 import { GameSignalRService } from '../../../../game-signal-r.service';
 import { BoardComponent, SelectedCell } from './components/board/board';
 import { GameOutcomeOverlayComponent } from '../../../../components/game-outcome-overlay/game-outcome-overlay';
+import { ConnectionLostOverlayComponent } from '../../../../components/connection-lost-overlay/connection-lost-overlay';
 import { WaitingForOpponentDialogComponent } from '../../../../components/waiting-for-opponent/waiting-for-opponent';
 
 type ShipOrientation = 'horizontal' | 'vertical';
@@ -72,7 +73,7 @@ const shipDefinitions: readonly ShipDefinition[] = [
 
 @Component({
   selector: 'bat-game-route-shell',
-  imports: [RouterLink, BoardComponent, GameOutcomeOverlayComponent, WaitingForOpponentDialogComponent],
+  imports: [RouterLink, BoardComponent, GameOutcomeOverlayComponent, ConnectionLostOverlayComponent, WaitingForOpponentDialogComponent],
   templateUrl: './game-route-shell.html',
   styleUrl: './game-route-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -151,6 +152,7 @@ export class GameRouteShell implements OnInit, OnDestroy {
   protected readonly opponentBoardState = signal<OpponentBoardState>({ knownShots: [] });
   protected readonly selectedAttackCell = signal<SelectedCell | null>(null);
   protected readonly firing = signal(false);
+  protected readonly opponentDisconnected = signal(false);
 
   // ── Combat tab selection ──────────────────────────────────────────────────
   private readonly manualCombatTab = signal<'attack' | 'defend' | null>(null);
@@ -205,6 +207,25 @@ export class GameRouteShell implements OnInit, OnDestroy {
       return `${selectedShip.label.toUpperCase()} selected // deploy or reposition on a valid grid cell.`;
     }
     return 'Select a hull from the inventory or drag one straight onto the setup board.';
+  });
+
+  // ── Combat statistics ────────────────────────────────────────────────────
+  protected readonly myStats = computed(() => {
+    const shots = this.opponentBoardState().knownShots;
+    const total = shots.length;
+    const hits = shots.filter(s => s.outcome > 0).length;
+    const misses = total - hits;
+    const ratio = total > 0 ? Math.round((hits / total) * 100) : 0;
+    return { total, hits, misses, ratio };
+  });
+
+  protected readonly opponentStats = computed(() => {
+    const shots = this.ownBoardState().incomingShots;
+    const total = shots.length;
+    const hits = shots.filter(s => s.outcome > 0).length;
+    const misses = total - hits;
+    const ratio = total > 0 ? Math.round((hits / total) * 100) : 0;
+    return { total, hits, misses, ratio };
   });
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -300,6 +321,18 @@ export class GameRouteShell implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.subs.add(
+      this.signalR.opponentConnectionLost$.subscribe(() => {
+        this.opponentDisconnected.set(true);
+      })
+    );
+
+    this.subs.add(
+      this.signalR.opponentReconnected$.subscribe(() => {
+        this.opponentDisconnected.set(false);
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -309,6 +342,10 @@ export class GameRouteShell implements OnInit, OnDestroy {
 
   // ── Outcome actions ────────────────────────────────────────────────────────
   protected backToMain(): void {
+    this.router.navigate(['/']);
+  }
+
+  protected onConnectionTimeout(): void {
     this.router.navigate(['/']);
   }
 
